@@ -1,4 +1,5 @@
 require 'bundler'
+require 'active_support/core_ext/object/blank'
 
 Bundler.require(:default, :development)
 

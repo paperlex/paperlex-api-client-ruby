@@ -1,7 +1,9 @@
 require 'active_support/dependencies/autoload'
+require 'active_support/core_ext/module/delegation'
 require 'hashie/mash'
 require 'rest-client'
 require 'json'
+require 'configatron'
 
 module Paperlex
   extend ActiveSupport::Autoload
@@ -10,6 +12,15 @@ module Paperlex
   autoload :Slaw
 
   class << self
-    attr_accessor :base_url, :token
+    delegate :configure_from_hash, :base_url, :token, :base_url=, :token=, :to => :configatron
   end
+
+  default_url =
+    if ENV['RACK_ENV'] == 'production' || ENV['RAILS_ENV'] == 'production'
+      'https://api.paperlex.com/v1'
+    else
+      'https://sandbox.api.paperlex.com/v1'
+    end
+  configatron.set_default(:base_url, default_url)
+  configatron.set_default(:token, nil)
 end

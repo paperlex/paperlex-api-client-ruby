@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
   s.add_dependency "rest-client"
   s.add_dependency "hashie"
   s.add_dependency "json"
+  s.add_dependency "configatron"
   s.add_dependency "active_support", ">= 3.0.0"
 
   s.add_development_dependency "rspec"
