@@ -3,7 +3,7 @@ module Paperlex
     class << self
       def create(attrs = {})
         attrs = JSON.parse(RestClient.post("#{Paperlex.base_url}/slaws.json", slaw: attrs, token: Paperlex.token))
-        new(attrs.uuid, attrs)
+        new(attrs['uuid'], attrs)
       end
 
       def find(uuid)
