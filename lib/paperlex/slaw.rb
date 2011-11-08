@@ -17,7 +17,9 @@ module Paperlex
     end
 
     def html_url(responses)
-      "#{Paperlex.base_url}/slaws/#{@uuid}.html?#{{responses: responses || {}, token: Paperlex.token}.to_query}"
+      params = {token: Paperlex.token}
+      params[:responses] = responses if responses.present?
+      "#{Paperlex.base_url}/slaws/#{@uuid}.html?#{params.to_query}"
     end
 
     def to_html(responses)
