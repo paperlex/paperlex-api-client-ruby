@@ -7,11 +7,11 @@ require "paperlex/version"
 Gem::Specification.new do |s|
   s.name        = "paperlex_api_client"
   s.version     = Paperlex::VERSION
-  s.authors     = ["TODO: Your name"]
-  s.email       = ["TODO: Your email"]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of PaperlexApiClient."
-  s.description = "TODO: Description of PaperlexApiClient."
+  s.authors     = ["Ben Woosley"]
+  s.email       = ["ben@paperlex.com"]
+  s.homepage    = "https://api.paperlex.com/"
+  s.summary     = "A Paperlex API client in Ruby"
+  s.description = "Dead-simple Legal Documents"
 
   s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["test/**/*"]
