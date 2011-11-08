@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   s.add_dependency "hashie"
   s.add_dependency "json"
   s.add_dependency "configatron"
-  s.add_dependency "active_support", ">= 3.0.0"
+  s.add_dependency "activesupport", ">= 3.0.0"
 
   s.add_development_dependency "rspec"
   s.add_development_dependency "faker"
