@@ -6,7 +6,7 @@ describe Paperlex::Contract do
     @body = Faker::Lorem.paragraphs.join("\n\n")
     @subject = Faker::Company.catch_phrase
 
-    unless ENV['TEST_API']
+    unless Paperlex.token
       FakeWeb.register_uri :post, "#{Paperlex.base_url}/contracts.json", body: "{\"locked\":false,\"responses\":null,\"created_at\":\"2011-10-27T23:28:31Z\",\"body\":\"#{@body.gsub("\n", '\n')}\",\"current_version\":true,\"uuid\":\"#{@contract_uuid}\",\"updated_at\":\"2011-10-27T23:28:31Z\",\"number_of_identity_verifications\":1,\"subject\":\"#{@subject}\",\"number_of_signers\":2,\"signers\":[],\"signatures\":[]}"
     end
   end
@@ -18,7 +18,7 @@ describe Paperlex::Contract do
         @contract.subject.should == @subject
         @contract.body.should == @body
         @contract.current_version.should == true
-        @contract.uuid.should == @contract_uuid
+        @contract.uuid.should be_present
         @contract.updated_at.should be_present
         @contract.created_at.should be_present
       end
@@ -39,7 +39,7 @@ describe Paperlex::Contract do
 
     context "with signers do" do
       before do
-        unless ENV['TEST_API']
+        unless Paperlex.token
           FakeWeb.register_uri :post, "#{Paperlex.base_url}/contracts/#{@contract_uuid}/signers.json", body: "{\"uuid\":\"3ab109b11a083b31\",\"email\":\"janesmith@example.com\"}"
         end
 

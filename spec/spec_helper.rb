@@ -7,7 +7,11 @@ Bundler.require(:default, :development)
 # in spec/support/ and its subdirectories.
 # Dir["./support/**/*.rb"].each {|f| require f}
 
-FakeWeb.allow_net_connect = false
+if ENV['TOKEN']
+  Paperlex.token = ENV['TOKEN']
+else
+  FakeWeb.allow_net_connect = false
+end
 
 RSpec.configure do |config|
   # == Mock Framework

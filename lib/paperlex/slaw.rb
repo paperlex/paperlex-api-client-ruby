@@ -5,9 +5,6 @@ module Paperlex
     property :name, :required => true
     property :description, :required => true
     property :body, :required => true
-    property :current_version, :required => true
-    property :created_at, :required => true
-    property :updated_at, :required => true
 
     class << self
       def create(attrs = {})
