@@ -29,7 +29,12 @@ module Paperlex
     end
 
     def create_signer(email)
+      # TODO: we should make all signers instantiated as Paperlex::Signer objects, not just those added this way
       self.signers << Paperlex::Signer.create(contract_uuid: uuid, email: email)
+    end
+
+    def create_review_session(email, options = {})
+      Paperlex::ReviewSession.create(options.merge(contract_uuid: uuid, email: email))
     end
   end
 end

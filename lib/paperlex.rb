@@ -12,6 +12,7 @@ module Paperlex
   autoload :Contract
   autoload :Slaw
   autoload :Signer
+  autoload :ReviewSession
 
   class << self
     delegate :configure_from_hash, :base_url, :token, :base_url=, :token=, :to => :configatron
