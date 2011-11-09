@@ -16,8 +16,20 @@ module Paperlex
 
     class << self
       def create(attrs = {})
-        new(JSON.parse(RestClient.post("#{Paperlex.base_url}/contracts.json", contract: attrs, token: Paperlex.token)))
+        attrs.symbolize_keys!
+        signers = attrs.delete(:signers)
+        result = new(JSON.parse(RestClient.post("#{Paperlex.base_url}/contracts.json", contract: attrs, token: Paperlex.token)))
+        if signers.present?
+          signers.each do |email|
+            result.create_signer(email)
+          end
+        end
+        result
       end
+    end
+
+    def create_signer(email)
+      self.signers << Paperlex::Signer.create(contract_uuid: uuid, email: email)
     end
   end
 end

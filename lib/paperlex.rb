@@ -1,5 +1,6 @@
 require 'active_support/dependencies/autoload'
 require 'active_support/core_ext/module/delegation'
+require 'active_support/core_ext/hash/keys'
 require 'hashie/dash'
 require 'rest-client'
 require 'json'
@@ -10,6 +11,7 @@ module Paperlex
 
   autoload :Contract
   autoload :Slaw
+  autoload :Signer
 
   class << self
     delegate :configure_from_hash, :base_url, :token, :base_url=, :token=, :to => :configatron
