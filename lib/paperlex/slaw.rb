@@ -1,5 +1,14 @@
 module Paperlex
-  class Slaw < Hashie::Mash
+  class Slaw < Hashie::Dash
+    property :uuid, :required => true
+    property :public, :required => true
+    property :name, :required => true
+    property :description, :required => true
+    property :body, :required => true
+    property :current_version, :required => true
+    property :created_at, :required => true
+    property :updated_at, :required => true
+
     class << self
       def create(attrs = {})
         attrs = JSON.parse(RestClient.post("#{Paperlex.base_url}/slaws.json", slaw: attrs, token: Paperlex.token))

@@ -1,6 +1,6 @@
 require 'active_support/dependencies/autoload'
 require 'active_support/core_ext/module/delegation'
-require 'hashie/mash'
+require 'hashie/dash'
 require 'rest-client'
 require 'json'
 require 'configatron'
