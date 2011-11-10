@@ -14,16 +14,17 @@ module Paperlex
   autoload :Signer
   autoload :ReviewSession
 
+  SANDBOX_URL = 'https://sandbox.api.paperlex.com/v1'
+  LIVE_URL = 'https://api.paperlex.com/v1'
+
   class << self
     delegate :configure_from_hash, :base_url, :token, :base_url=, :token=, :to => :configatron
+
+    def live!
+      self.base_url = LIVE_URL
+    end
   end
 
-  default_url =
-    if ENV['RACK_ENV'] == 'production' || ENV['RAILS_ENV'] == 'production'
-      'https://api.paperlex.com/v1'
-    else
-      'https://sandbox.api.paperlex.com/v1'
-    end
-  configatron.set_default(:base_url, default_url)
+  configatron.set_default(:base_url, SANDBOX_URL)
   configatron.set_default(:token, nil)
 end
