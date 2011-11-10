@@ -24,20 +24,20 @@ module Paperlex
         result = new(JSON.parse(RestClient.post("#{Paperlex.base_url}/contracts.json", contract: attrs, token: Paperlex.token)))
         if signers.present?
           signers.each do |email|
-            result.create_signer(email)
+            result.create_signer(email: email)
           end
         end
         result
       end
     end
 
-    def create_signer(email)
+    def create_signer(attrs = {})
       # TODO: we should make all signers instantiated as Paperlex::Signer objects, not just those added this way
-      self.signers << Paperlex::Signer.create(contract_uuid: uuid, email: email)
+      self.signers << Paperlex::Signer.create(attrs.merge(contract_uuid: uuid))
     end
 
-    def create_review_session(email, options = {})
-      Paperlex::ReviewSession.create(options.merge(contract_uuid: uuid, email: email))
+    def create_review_session(attrs = {})
+      Paperlex::ReviewSession.create(attrs.merge(contract_uuid: uuid))
     end
   end
 end
