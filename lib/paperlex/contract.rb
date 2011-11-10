@@ -14,10 +14,13 @@ module Paperlex
     property :created_at, :required => true
     property :updated_at, :required => true
 
+    CREATE_PARAMS = [:subject, :number_of_signers, :responses, :signature_callback_url, :body, :slaw_id]
+
     class << self
       def create(attrs = {})
         attrs.symbolize_keys!
         signers = attrs.delete(:signers)
+        attrs.assert_valid_keys(CREATE_PARAMS)
         result = new(JSON.parse(RestClient.post("#{Paperlex.base_url}/contracts.json", contract: attrs, token: Paperlex.token)))
         if signers.present?
           signers.each do |email|
