@@ -1,5 +1,5 @@
 module Paperlex
-  class ReviewSession < Hashie::Dash
+  class ReviewSession < Base
     property :expires_at, :required => true
     property :uuid, :required => true
     property :token, :required => true
@@ -14,7 +14,7 @@ module Paperlex
         attrs.symbolize_keys!
         contract_uuid = attrs.delete(:contract_uuid)
         attrs.assert_valid_keys(CREATE_PARAMS)
-        new(JSON.parse(RestClient.post("#{Paperlex.base_url}/contracts/#{contract_uuid}/review_sessions.json", :review_session => attrs, :token => Paperlex.token)).merge(:contract_uuid => contract_uuid))
+        new(post("#{Paperlex.base_url}/contracts/#{contract_uuid}/review_sessions.json", :review_session => attrs, :token => Paperlex.token).merge(:contract_uuid => contract_uuid))
       end
     end
   end

@@ -9,6 +9,7 @@ require 'configatron'
 module Paperlex
   extend ActiveSupport::Autoload
 
+  autoload :Base
   autoload :Contract
   autoload :Slaw
   autoload :Signer

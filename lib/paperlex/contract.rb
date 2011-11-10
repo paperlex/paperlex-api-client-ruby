@@ -1,5 +1,5 @@
 module Paperlex
-  class Contract < Hashie::Dash
+  class Contract < Base
     property :uuid, :required => true
     property :subject, :required => true
     property :body, :required => true
@@ -21,7 +21,7 @@ module Paperlex
         attrs.symbolize_keys!
         signers = attrs.delete(:signers)
         attrs.assert_valid_keys(CREATE_PARAMS)
-        result = new(JSON.parse(RestClient.post("#{Paperlex.base_url}/contracts.json", contract: attrs, token: Paperlex.token)))
+        result = new(post("#{Paperlex.base_url}/contracts.json", contract: attrs, token: Paperlex.token))
         if signers.present?
           signers.each do |email|
             result.create_signer(email: email)
