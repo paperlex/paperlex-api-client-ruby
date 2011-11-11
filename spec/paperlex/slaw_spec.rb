@@ -20,4 +20,11 @@ describe Paperlex::Slaw do
       slaw.uuid.should be_present
     end
   end
+
+  describe ".find" do
+    it "should create a slaw with just a uuid" do
+      slaw = Paperlex::Slaw.find('23a15b9e18d09168')
+      slaw.uuid.should == '23a15b9e18d09168'
+    end
+  end
 end

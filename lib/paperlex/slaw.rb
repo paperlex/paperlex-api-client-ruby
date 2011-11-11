@@ -1,10 +1,10 @@
 module Paperlex
   class Slaw < Base
     property :uuid, :required => true
-    property :public, :required => true
-    property :name, :required => true
-    property :description, :required => true
-    property :body, :required => true
+    property :public
+    property :name
+    property :description
+    property :body
 
     CREATE_PARAMS = [:name, :body, :description]
 
@@ -22,14 +22,13 @@ module Paperlex
     end
 
     def initialize(uuid, attrs = {})
-      @uuid = uuid
-      super(attrs)
+      super(attrs.merge(uuid: uuid))
     end
 
     def html_url(responses)
       params = {token: Paperlex.token}
       params[:responses] = responses if responses.present?
-      "#{Paperlex.base_url}/slaws/#{@uuid}.html?#{params.to_query}"
+      "#{Paperlex.base_url}/slaws/#{uuid}.html?#{params.to_query}"
     end
 
     def to_html(responses)
