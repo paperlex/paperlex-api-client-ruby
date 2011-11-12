@@ -1,22 +1,29 @@
 module Paperlex
   class Contract < Base
-    property :uuid, :required => true
-    property :subject, :required => true
-    property :body, :required => true
-    property :current_version, :required => true
-    property :locked, :required => true
-    property :number_of_signers, :required => true
-    property :number_of_identity_verifications, :required => true
-    property :responses
-    property :signers, :required => true
-    property :signatures, :required => true
-    property :signature_callback_url
+    # Provided by index
     property :created_at, :required => true
     property :updated_at, :required => true
+    property :uuid, :required => true
+    property :subject, :required => true
+
+    # Provided by show
+    property :body
+    property :current_version
+    property :locked
+    property :number_of_signers
+    property :number_of_identity_verifications
+    property :responses
+    property :signers
+    property :signatures
+    property :signature_callback_url
 
     CREATE_PARAMS = [:subject, :number_of_signers, :responses, :signature_callback_url, :body, :slaw_id]
 
     class << self
+      def all
+        get('contracts.json').map {|attrs| new(attrs) }
+      end
+
       def create(attrs = {})
         attrs.symbolize_keys!
         signers = attrs.delete(:signers)

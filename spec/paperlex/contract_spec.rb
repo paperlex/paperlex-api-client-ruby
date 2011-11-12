@@ -11,6 +11,25 @@ describe Paperlex::Contract do
     end
   end
 
+  describe ".all" do
+    before do
+      unless Paperlex.token
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts.json", body: %{[{"created_at":"2011-10-04T07:09:01Z","uuid":"ce883764523af12e","updated_at":"2011-10-04T07:09:01Z","subject":"NDA"},{"created_at":"2011-10-04T07:09:01Z","uuid":"0694fb3b248c8973","updated_at":"2011-10-04T07:09:01Z","subject":"Pay me"}]}
+      end
+    end
+
+    it "should fetch all existing contracts" do
+      @contracts = Paperlex::Contract.all
+      @contracts.size.should == 2
+      @contracts.each do |contract|
+        contract.created_at.should be_present
+        contract.updated_at.should be_present
+        contract.subject.should be_present
+        contract.uuid.should be_present
+      end
+    end
+  end
+
   describe ".create" do
     shared_examples_for "contract creation" do
       it "should return a contract object" do
