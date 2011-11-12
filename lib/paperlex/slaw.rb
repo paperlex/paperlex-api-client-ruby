@@ -8,6 +8,10 @@ module Paperlex
     CREATE_FIELDS = [:name, :body, :description]
 
     class << self
+      def all
+        get('slaws.json').map {|attrs| new(attrs) }
+      end
+
       def create(attrs = {})
         attrs.symbolize_keys!
         attrs.assert_valid_keys(CREATE_FIELDS)

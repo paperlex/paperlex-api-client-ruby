@@ -11,6 +11,25 @@ describe Paperlex::Slaw do
     end
   end
 
+  describe ".all" do
+    before do
+      unless Paperlex.token
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws.json", body: %{[{"name":"Non-Disclosure Agreement","public":true,"uuid":"23a15b9e18d09168","description":"Non-Disclosure Agreement"}]}
+      end
+    end
+
+    it "should fetch all existing contracts" do
+      @slaws = Paperlex::Slaw.all
+      @slaws.size.should == 1
+      @slaws.each do |slaw|
+        slaw.name.should be_present
+        slaw.public.should be_present
+        slaw.uuid.should be_present
+        slaw.description.should be_present
+      end
+    end
+  end
+
   describe ".create" do
     it "should return a contract object" do
       slaw = Paperlex::Slaw.create({"body" => @body,"name" => @name,"description" => @description})
