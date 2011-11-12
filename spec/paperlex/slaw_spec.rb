@@ -57,4 +57,22 @@ describe Paperlex::Slaw do
       slaw.public.should be_present
     end
   end
+
+  describe "#save!" do
+    before do
+      @slaw = Paperlex::Slaw.create({"body" => @body,"name" => @name,"description" => @description})
+      FakeWeb.register_uri :put, "#{Paperlex.base_url}/slaws/#{@slaw.uuid}.json", body: "{}"
+    end
+
+    it "should send the update to api.paperlex.com" do
+      @slaw.body = 'Foo'
+      @slaw.name = 'Bar'
+      @slaw.description = 'Baz'
+      Paperlex::Base.should_receive(:put).with(Paperlex::Slaw.url_for(@slaw.uuid), {body: 'Foo', name: 'Bar', description: 'Baz'})
+      @slaw.save!
+      @slaw.body.should == 'Foo'
+      @slaw.name.should == 'Bar'
+      @slaw.description.should == 'Baz'
+    end
+  end
 end

@@ -7,17 +7,20 @@ module Paperlex
     property :description
     property :body
 
-    CREATE_FIELDS = [:name, :body, :description]
-
     class << self
       def url_name
         "slaws"
       end
 
+      def update_fields
+        [:name, :body, :description]
+      end
+      alias :create_fields :update_fields
+
       def create(attrs = {})
         attrs.symbolize_keys!
-        attrs.assert_valid_keys(CREATE_FIELDS)
-        attrs = post("slaws.json", slaw: attrs, token: Paperlex.token)
+        attrs.assert_valid_keys(create_fields)
+        attrs = post(collection_url, slaw: attrs, token: Paperlex.token)
         new(attrs)
       end
     end

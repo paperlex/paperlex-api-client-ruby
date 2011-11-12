@@ -18,10 +18,15 @@ module Paperlex
     property :signatures
     property :signature_callback_url
 
-    UPDATE_FIELDS = [:subject, :number_of_signers, :responses, :signature_callback_url, :body]
-    CREATE_FIELDS = [*UPDATE_FIELDS, :slaw_id]
-
     class << self
+      def update_fields
+        [:subject, :number_of_signers, :responses, :signature_callback_url, :body]
+      end
+
+      def create_fields
+        [*update_fields, :slaw_id]
+      end
+
       def url_name
         "contracts"
       end
@@ -29,7 +34,7 @@ module Paperlex
       def create(attrs = {})
         attrs.symbolize_keys!
         signers = attrs.delete(:signers)
-        attrs.assert_valid_keys(CREATE_FIELDS)
+        attrs.assert_valid_keys(create_fields)
         result = new(post("contracts.json", contract: attrs, token: Paperlex.token))
         if signers.present?
           signers.each do |email|
@@ -42,12 +47,6 @@ module Paperlex
 
     def html_url
       "#{Paperlex.base_url}/contracts/#{uuid}.html?#{{token: Paperlex.token}.to_query}"
-    end
-
-    def save!(fields = nil)
-      fields ||= UPDATE_FIELDS
-      self.class.put(self.class.url_for(uuid), Hash[fields.map {|field| [field, self[field]]}])
-      self
     end
 
     def create_signer(attrs = {})
