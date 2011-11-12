@@ -1,9 +1,9 @@
 module Paperlex
   class Contract < Base
     # Provided by index
-    property :created_at, :required => true
-    property :updated_at, :required => true
-    property :subject, :required => true
+    property :created_at
+    property :updated_at
+    property :subject
 
     # Provided by show
     property :body
@@ -39,6 +39,10 @@ module Paperlex
       def find(uuid)
         new(get("contracts/#{uuid}.json"))
       end
+    end
+
+    def html_url
+      "#{Paperlex.base_url}/contracts/#{uuid}.html?#{{token: Paperlex.token}.to_query}"
     end
 
     def create_signer(attrs = {})

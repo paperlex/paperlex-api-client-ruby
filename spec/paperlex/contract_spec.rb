@@ -96,4 +96,14 @@ describe Paperlex::Contract do
       @contract.signers.should be_present
     end
   end
+
+  describe "#html_url" do
+    before do
+      @uuid = "ce883764523af12e"
+    end
+
+    it "should return the html url" do
+      Paperlex::Contract.new(@uuid).html_url.should == "https://sandbox.api.paperlex.com/v1/contracts/#{@uuid}.html?token=#{Paperlex.token}"
+    end
+  end
 end
