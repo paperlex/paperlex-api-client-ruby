@@ -11,8 +11,10 @@ require 'configatron'
 module Paperlex
   extend ActiveSupport::Autoload
 
-  autoload :Base
-  autoload :RootObject
+  autoload_under 'base' do
+    autoload :Base
+    autoload :RootObject
+  end
   autoload :Contract
   autoload :Slaw
   autoload :Signer
