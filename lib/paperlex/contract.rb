@@ -21,7 +21,7 @@ module Paperlex
         attrs.symbolize_keys!
         signers = attrs.delete(:signers)
         attrs.assert_valid_keys(CREATE_PARAMS)
-        result = new(post("#{Paperlex.base_url}/contracts.json", contract: attrs, token: Paperlex.token))
+        result = new(post("contracts.json", contract: attrs, token: Paperlex.token))
         if signers.present?
           signers.each do |email|
             result.create_signer(email: email)

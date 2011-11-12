@@ -1,8 +1,8 @@
 module Paperlex
   class Base < Hashie::Dash
     class << self
-      def post(*attrs)
-        JSON.parse(RestClient.post(*attrs))
+      def post(url, *attrs)
+        JSON.parse(RestClient.post("#{Paperlex.base_url}/#{url}", *attrs))
       end
     end
   end

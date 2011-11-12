@@ -12,7 +12,7 @@ module Paperlex
       def create(attrs = {})
         attrs.symbolize_keys!
         attrs.assert_valid_keys(CREATE_PARAMS)
-        attrs = post("#{Paperlex.base_url}/slaws.json", slaw: attrs, token: Paperlex.token)
+        attrs = post("slaws.json", slaw: attrs, token: Paperlex.token)
         new(attrs['uuid'], attrs)
       end
 

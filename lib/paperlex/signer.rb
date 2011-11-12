@@ -11,7 +11,7 @@ module Paperlex
         attrs.symbolize_keys!
         contract_uuid = attrs.delete(:contract_uuid)
         attrs.assert_valid_keys(CREATE_PARAMS)
-        new(post("#{Paperlex.base_url}/contracts/#{contract_uuid}/signers.json", signer: attrs, token: Paperlex.token).merge(:contract_uuid => contract_uuid))
+        new(post("contracts/#{contract_uuid}/signers.json", signer: attrs, token: Paperlex.token).merge(:contract_uuid => contract_uuid))
       end
     end
   end
