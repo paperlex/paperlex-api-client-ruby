@@ -106,4 +106,22 @@ describe Paperlex::Contract do
       Paperlex::Contract.new(@uuid).html_url.should == "https://sandbox.api.paperlex.com/v1/contracts/#{@uuid}.html?token=#{Paperlex.token}"
     end
   end
+
+  describe "#save!" do
+    before do
+      @contract = Paperlex::Contract.create("body" => @body,"subject" => @subject,"number_of_signers" => 2)
+      FakeWeb.register_uri :put, "#{Paperlex.base_url}/contracts/#{@contract.uuid}.json", body: "{}"
+    end
+
+    it "should send the update to api.paperlex.com" do
+      @contract.body = 'Foo'
+      @contract.subject = 'Bar'
+      @contract.number_of_signers = 3
+      Paperlex::Base.should_receive(:put).with(Paperlex::Contract.url_for(@contract.uuid), {body: 'Foo', subject: 'Bar', number_of_signers: 3, responses: @contract.responses, signature_callback_url: @contract.signature_callback_url})
+      @contract.save!
+      @contract.body.should == 'Foo'
+      @contract.subject.should == 'Bar'
+      @contract.number_of_signers.should == 3
+    end
+  end
 end

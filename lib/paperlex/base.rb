@@ -10,6 +10,10 @@ module Paperlex
       def get(url, *attrs)
         JSON.parse(RestClient.get("#{Paperlex.base_url}/#{url}", *attrs))
       end
+
+      def put(url, *attrs)
+        JSON.parse(RestClient.put("#{Paperlex.base_url}/#{url}", *attrs))
+      end
     end
 
     def initialize(uuid, attrs = {})

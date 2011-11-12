@@ -5,12 +5,12 @@ module Paperlex
     property :description
     property :body
 
-    CREATE_PARAMS = [:name, :body, :description]
+    CREATE_FIELDS = [:name, :body, :description]
 
     class << self
       def create(attrs = {})
         attrs.symbolize_keys!
-        attrs.assert_valid_keys(CREATE_PARAMS)
+        attrs.assert_valid_keys(CREATE_FIELDS)
         attrs = post("slaws.json", slaw: attrs, token: Paperlex.token)
         new(attrs)
       end
