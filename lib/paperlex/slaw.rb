@@ -1,5 +1,7 @@
 module Paperlex
   class Slaw < Base
+    include RootObject
+
     property :public
     property :name
     property :description
@@ -8,8 +10,8 @@ module Paperlex
     CREATE_FIELDS = [:name, :body, :description]
 
     class << self
-      def all
-        get('slaws.json').map {|attrs| new(attrs) }
+      def url_name
+        "slaws"
       end
 
       def create(attrs = {})
@@ -17,10 +19,6 @@ module Paperlex
         attrs.assert_valid_keys(CREATE_FIELDS)
         attrs = post("slaws.json", slaw: attrs, token: Paperlex.token)
         new(attrs)
-      end
-
-      def find(uuid)
-        new(uuid)
       end
     end
 

@@ -1,4 +1,5 @@
 require 'active_support/dependencies/autoload'
+require 'active_support/concern'
 require 'active_support/core_ext/module/delegation'
 require 'active_support/core_ext/hash/keys'
 require 'active_support/core_ext/object/to_query'
@@ -11,6 +12,7 @@ module Paperlex
   extend ActiveSupport::Autoload
 
   autoload :Base
+  autoload :RootObject
   autoload :Contract
   autoload :Slaw
   autoload :Signer

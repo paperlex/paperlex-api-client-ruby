@@ -1,5 +1,7 @@
 module Paperlex
   class Contract < Base
+    include RootObject
+
     # Provided by index
     property :created_at
     property :updated_at
@@ -20,8 +22,8 @@ module Paperlex
     CREATE_FIELDS = [*UPDATE_FIELDS, :slaw_id]
 
     class << self
-      def all
-        get('contracts.json').map {|attrs| new(attrs) }
+      def url_name
+        "contracts"
       end
 
       def create(attrs = {})
@@ -35,14 +37,6 @@ module Paperlex
           end
         end
         result
-      end
-
-      def url_for(uuid)
-        "contracts/#{uuid}.json"
-      end
-
-      def find(uuid)
-        new(get(url_for(uuid)))
       end
     end
 

@@ -41,9 +41,20 @@ describe Paperlex::Slaw do
   end
 
   describe ".find" do
+    before do
+      unless Paperlex.token
+        @uuid = '23a15b9e18d09168'
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws/#{@uuid}.json", body: %{{"name":"Non-Disclosure Agreement","public":true,"body":"This Non-Disclosure Agreement (the **Agreement**) is made as of **{{effective_date}}** (the **Effective Date**) by and between **{{party_a}}**, reachable at **{{party_a_address}}**; and **{{party_b}}**","uuid":"#{@uuid}","description":"Non-Disclosure Agreement"}}
+      end
+    end
+
     it "should create a slaw with just a uuid" do
-      slaw = Paperlex::Slaw.find('23a15b9e18d09168')
-      slaw.uuid.should == '23a15b9e18d09168'
+      slaw = Paperlex::Slaw.find(@uuid)
+      slaw.uuid.should == @uuid
+      slaw.body.should be_present
+      slaw.description.should be_present
+      slaw.name.should be_present
+      slaw.public.should be_present
     end
   end
 end
