@@ -34,5 +34,9 @@ module Paperlex
     def to_html(responses)
       RestClient.get(html_url(responses))
     end
+
+    def destroy
+      self.class.delete(self.class.url_for(uuid))
+    end
   end
 end

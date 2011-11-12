@@ -75,4 +75,16 @@ describe Paperlex::Slaw do
       @slaw.description.should == 'Baz'
     end
   end
+
+  describe "#destory" do
+    before do
+      @slaw = Paperlex::Slaw.create({"body" => @body,"name" => @name,"description" => @description})
+      FakeWeb.register_uri :delete, "#{Paperlex.base_url}/slaws/#{@slaw.uuid}.json", body: "{}"
+    end
+
+    it "should ping api.paperlex.com" do
+      Paperlex::Base.should_receive(:delete).with(Paperlex::Slaw.url_for(@slaw.uuid))
+      @slaw.destroy
+    end
+  end
 end

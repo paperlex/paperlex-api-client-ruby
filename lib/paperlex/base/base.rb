@@ -14,6 +14,10 @@ module Paperlex
       def put(url, *attrs)
         JSON.parse(RestClient.put("#{Paperlex.base_url}/#{url}", *attrs))
       end
+
+      def delete(url, *attrs)
+        JSON.parse(RestClient.delete("#{Paperlex.base_url}/#{url}", *attrs))
+      end
     end
 
     def initialize(uuid, attrs = {})
