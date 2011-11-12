@@ -3,7 +3,6 @@ module Paperlex
     # Provided by index
     property :created_at, :required => true
     property :updated_at, :required => true
-    property :uuid, :required => true
     property :subject, :required => true
 
     # Provided by show
@@ -35,6 +34,10 @@ module Paperlex
           end
         end
         result
+      end
+
+      def find(uuid)
+        new(get("contracts/#{uuid}.json"))
       end
     end
 

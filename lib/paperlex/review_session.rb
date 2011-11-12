@@ -1,7 +1,6 @@
 module Paperlex
   class ReviewSession < Base
     property :expires_at, :required => true
-    property :uuid, :required => true
     property :token, :required => true
     property :url, :required => true
     property :email, :required => true

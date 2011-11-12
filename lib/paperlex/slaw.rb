@@ -1,6 +1,5 @@
 module Paperlex
   class Slaw < Base
-    property :uuid, :required => true
     property :public
     property :name
     property :description
@@ -13,16 +12,12 @@ module Paperlex
         attrs.symbolize_keys!
         attrs.assert_valid_keys(CREATE_PARAMS)
         attrs = post("slaws.json", slaw: attrs, token: Paperlex.token)
-        new(attrs['uuid'], attrs)
+        new(attrs)
       end
 
       def find(uuid)
         new(uuid)
       end
-    end
-
-    def initialize(uuid, attrs = {})
-      super(attrs.merge(uuid: uuid))
     end
 
     def html_url(responses)

@@ -1,6 +1,5 @@
 module Paperlex
   class Signer < Base
-    property :uuid, :required => true
     property :contract_uuid, :required => true
     property :email, :required => true
 
