@@ -31,10 +31,6 @@ module Paperlex
       "#{Paperlex.base_url}/slaws/#{uuid}.html?#{params.to_query}"
     end
 
-    def to_html(responses)
-      RestClient.get(html_url(responses))
-    end
-
     def destroy
       self.class.delete(self.class.url_for(uuid))
     end

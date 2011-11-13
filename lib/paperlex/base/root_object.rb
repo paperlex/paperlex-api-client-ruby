@@ -20,6 +20,10 @@ module Paperlex
       end
     end
 
+    def to_html
+      RestClient.get(html_url(responses))
+    end
+
     def save!(fields = nil)
       fields ||= self.class.update_fields
       self.class.put(self.class.url_for(uuid), Hash[fields.map {|field| [field, self[field]]}])
