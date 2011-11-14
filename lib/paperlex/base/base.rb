@@ -21,7 +21,7 @@ module Paperlex
     end
 
     def initialize(uuid, attrs = {})
-      super(uuid.is_a?(Hash) ? uuid.merge(attrs) : attrs.merge(uuid: uuid))
+      super(uuid.is_a?(Hash) ? uuid.merge(attrs) : attrs.merge(:uuid => uuid))
     end
   end
 end

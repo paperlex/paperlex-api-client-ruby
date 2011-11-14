@@ -35,10 +35,10 @@ module Paperlex
         attrs.symbolize_keys!
         signers = attrs.delete(:signers)
         attrs.assert_valid_keys(create_fields)
-        result = new(post("contracts.json", contract: attrs, token: Paperlex.token))
+        result = new(post("contracts.json", :contract => attrs, :token => Paperlex.token))
         if signers.present?
           signers.each do |email|
-            result.create_signer(email: email)
+            result.create_signer(:email => email)
           end
         end
         result
@@ -46,16 +46,16 @@ module Paperlex
     end
 
     def html_url
-      "#{Paperlex.base_url}/contracts/#{uuid}.html?#{{token: Paperlex.token}.to_query}"
+      "#{Paperlex.base_url}/contracts/#{uuid}.html?#{{:token => Paperlex.token}.to_query}"
     end
 
     def create_signer(attrs = {})
       # TODO: we should make all signers instantiated as Paperlex::Signer objects, not just those added this way
-      self.signers << Paperlex::Signer.create(attrs.merge(contract_uuid: uuid))
+      self.signers << Paperlex::Signer.create(attrs.merge(:contract_uuid => uuid))
     end
 
     def create_review_session(attrs = {})
-      Paperlex::ReviewSession.create(attrs.merge(contract_uuid: uuid))
+      Paperlex::ReviewSession.create(attrs.merge(:contract_uuid => uuid))
     end
 
     def update_responses

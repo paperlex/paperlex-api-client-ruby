@@ -7,14 +7,14 @@ describe Paperlex::Slaw do
     @description = Faker::Company.catch_phrase
 
     unless Paperlex.token
-      FakeWeb.register_uri :post, "#{Paperlex.base_url}/slaws.json", body: "{\"public\":true,\"body\":\"#{@body.gsub("\n", '\n')}\",\"uuid\":\"23a15b9e18d09168\",\"name\":\"#{@name}\",\"description\":\"#{@description}\"}"
+      FakeWeb.register_uri :post, "#{Paperlex.base_url}/slaws.json", :body => "{\"public\":true,\"body\":\"#{@body.gsub("\n", '\n')}\",\"uuid\":\"23a15b9e18d09168\",\"name\":\"#{@name}\",\"description\":\"#{@description}\"}"
     end
   end
 
   describe ".all" do
     before do
       unless Paperlex.token
-        FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws.json", body: %{[{"name":"Non-Disclosure Agreement","public":true,"uuid":"23a15b9e18d09168","description":"Non-Disclosure Agreement"}]}
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws.json", :body => %{[{"name":"Non-Disclosure Agreement","public":true,"uuid":"23a15b9e18d09168","description":"Non-Disclosure Agreement"}]}
       end
     end
 
@@ -44,7 +44,7 @@ describe Paperlex::Slaw do
     before do
       unless Paperlex.token
         @uuid = '23a15b9e18d09168'
-        FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws/#{@uuid}.json", body: %{{"name":"Non-Disclosure Agreement","public":true,"body":"This Non-Disclosure Agreement (the **Agreement**) is made as of **{{effective_date}}** (the **Effective Date**) by and between **{{party_a}}**, reachable at **{{party_a_address}}**; and **{{party_b}}**","uuid":"#{@uuid}","description":"Non-Disclosure Agreement"}}
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws/#{@uuid}.json", :body => %{{"name":"Non-Disclosure Agreement","public":true,"body":"This Non-Disclosure Agreement (the **Agreement**) is made as of **{{effective_date}}** (the **Effective Date**) by and between **{{party_a}}**, reachable at **{{party_a_address}}**; and **{{party_b}}**","uuid":"#{@uuid}","description":"Non-Disclosure Agreement"}}
       end
     end
 
@@ -61,14 +61,14 @@ describe Paperlex::Slaw do
   describe "#save!" do
     before do
       @slaw = Paperlex::Slaw.create({"body" => @body,"name" => @name,"description" => @description})
-      FakeWeb.register_uri :put, "#{Paperlex.base_url}/slaws/#{@slaw.uuid}.json", body: "{}"
+      FakeWeb.register_uri :put, "#{Paperlex.base_url}/slaws/#{@slaw.uuid}.json", :body => "{}"
     end
 
     it "should send the update to api.paperlex.com" do
       @slaw.body = 'Foo'
       @slaw.name = 'Bar'
       @slaw.description = 'Baz'
-      Paperlex::Base.should_receive(:put).with(Paperlex::Slaw.url_for(@slaw.uuid), {body: 'Foo', name: 'Bar', description: 'Baz'})
+      Paperlex::Base.should_receive(:put).with(Paperlex::Slaw.url_for(@slaw.uuid), {:body => 'Foo', :name => 'Bar', :description => 'Baz'})
       @slaw.save!
       @slaw.body.should == 'Foo'
       @slaw.name.should == 'Bar'
@@ -79,7 +79,7 @@ describe Paperlex::Slaw do
   describe "#destory" do
     before do
       @slaw = Paperlex::Slaw.create({"body" => @body,"name" => @name,"description" => @description})
-      FakeWeb.register_uri :delete, "#{Paperlex.base_url}/slaws/#{@slaw.uuid}.json", body: "{}"
+      FakeWeb.register_uri :delete, "#{Paperlex.base_url}/slaws/#{@slaw.uuid}.json", :body => "{}"
     end
 
     it "should ping api.paperlex.com" do
