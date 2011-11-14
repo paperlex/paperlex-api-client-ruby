@@ -57,5 +57,18 @@ module Paperlex
     def create_review_session(attrs = {})
       Paperlex::ReviewSession.create(attrs.merge(contract_uuid: uuid))
     end
+
+    def update_responses
+      self.responses = Paperlex::Responses[uuid].all
+    end
+
+    def update_response(key)
+      self.responses[key] = Paperlex::Responses[uuid].fetch(key)
+    end
+
+    def delete_repsonse(key)
+      Paperlex::Responses[uuid].destroy(key)
+      self.responses.delete(key)
+    end
   end
 end
