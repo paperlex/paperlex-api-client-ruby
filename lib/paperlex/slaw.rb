@@ -20,7 +20,7 @@ module Paperlex
       def create(attrs = {})
         attrs.symbolize_keys!
         attrs.assert_valid_keys(create_fields)
-        attrs = post(collection_url, :slaw => attrs, :token => Paperlex.token)
+        attrs = post(collection_url, :slaw => attrs)
         new(attrs)
       end
     end

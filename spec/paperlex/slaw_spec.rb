@@ -14,7 +14,7 @@ describe Paperlex::Slaw do
   describe ".all" do
     before do
       unless Paperlex.token
-        FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws.json", :body => %{[{"name":"Non-Disclosure Agreement","public":true,"uuid":"23a15b9e18d09168","description":"Non-Disclosure Agreement"}]}
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws.json?token=", :body => %{[{"name":"Non-Disclosure Agreement","public":true,"uuid":"23a15b9e18d09168","description":"Non-Disclosure Agreement"}]}
       end
     end
 
@@ -44,7 +44,7 @@ describe Paperlex::Slaw do
     before do
       unless Paperlex.token
         @uuid = '23a15b9e18d09168'
-        FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws/#{@uuid}.json", :body => %{{"name":"Non-Disclosure Agreement","public":true,"body":"This Non-Disclosure Agreement (the **Agreement**) is made as of **{{effective_date}}** (the **Effective Date**) by and between **{{party_a}}**, reachable at **{{party_a_address}}**; and **{{party_b}}**","uuid":"#{@uuid}","description":"Non-Disclosure Agreement"}}
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws/#{@uuid}.json?token=", :body => %{{"name":"Non-Disclosure Agreement","public":true,"body":"This Non-Disclosure Agreement (the **Agreement**) is made as of **{{effective_date}}** (the **Effective Date**) by and between **{{party_a}}**, reachable at **{{party_a_address}}**; and **{{party_b}}**","uuid":"#{@uuid}","description":"Non-Disclosure Agreement"}}
       end
     end
 

@@ -14,7 +14,7 @@ describe Paperlex::Contract do
   describe ".all" do
     before do
       unless Paperlex.token
-        FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts.json", :body => %{[{"created_at":"2011-10-04T07:09:01Z","uuid":"ce883764523af12e","updated_at":"2011-10-04T07:09:01Z","subject":"NDA"},{"created_at":"2011-10-04T07:09:01Z","uuid":"0694fb3b248c8973","updated_at":"2011-10-04T07:09:01Z","subject":"Pay me"}]}
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts.json?token=", :body => %{[{"created_at":"2011-10-04T07:09:01Z","uuid":"ce883764523af12e","updated_at":"2011-10-04T07:09:01Z","subject":"NDA"},{"created_at":"2011-10-04T07:09:01Z","uuid":"0694fb3b248c8973","updated_at":"2011-10-04T07:09:01Z","subject":"Pay me"}]}
       end
     end
 
@@ -79,7 +79,7 @@ describe Paperlex::Contract do
     before do
       @uuid = "ce883764523af12e"
       unless Paperlex.token
-        FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@uuid}.json", :body => %{{"responses":null,"created_at":"2011-10-04T07:09:01Z","current_version":true,"body":"This Non-Disclosure Agreement (the **Agreement**) is made as of **{{effective_date}}** (the **Effective Date**) by and between **{{party_a}}**, reachable at **{{party_a_address}}**; and **{{party_b}}**", "uuid":"#{@uuid}", "updated_at":"2011-10-04T07:09:01Z", "signers":[{"uuid":"51c442d561291e5b","email":"jhahn@niveon.com"}], "locked":true, "subject":"NDA", "number_of_signers":2, "signatures":[{"created_at":"2011-10-05T00:47:18Z","uuid":"7559ad5cb0d36cf2","identity_verification_value":"555-555-1234","identity_verification_method":"SMS"}],"number_of_identity_verifications":1}}
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@uuid}.json?token=", :body => %{{"responses":null,"created_at":"2011-10-04T07:09:01Z","current_version":true,"body":"This Non-Disclosure Agreement (the **Agreement**) is made as of **{{effective_date}}** (the **Effective Date**) by and between **{{party_a}}**, reachable at **{{party_a_address}}**; and **{{party_b}}**", "uuid":"#{@uuid}", "updated_at":"2011-10-04T07:09:01Z", "signers":[{"uuid":"51c442d561291e5b","email":"jhahn@niveon.com"}], "locked":true, "subject":"NDA", "number_of_signers":2, "signatures":[{"created_at":"2011-10-05T00:47:18Z","uuid":"7559ad5cb0d36cf2","identity_verification_value":"555-555-1234","identity_verification_method":"SMS"}],"number_of_identity_verifications":1}}
       end
     end
 
