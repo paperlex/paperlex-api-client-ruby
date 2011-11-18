@@ -49,15 +49,18 @@ module Paperlex
       "#{Paperlex.base_url}/contracts/#{uuid}.html?#{{:token => Paperlex.token}.to_query}"
     end
 
+    # Signers
     def create_signer(attrs = {})
       # TODO: we should make all signers instantiated as Paperlex::Signer objects, not just those added this way
       self.signers << Paperlex::Signer.create(attrs.merge(:contract_uuid => uuid))
     end
 
+    # Review Sessions
     def create_review_session(attrs = {})
       Paperlex::ReviewSession.create(attrs.merge(:contract_uuid => uuid))
     end
 
+    # Responses
     def update_responses
       self.responses = Paperlex::Responses[uuid].all
     end
@@ -74,7 +77,7 @@ module Paperlex
       Paperlex::Responses[uuid].update(key, responses[key])
     end
 
-    def delete_repsonse(key)
+    def delete_response(key)
       Paperlex::Responses[uuid].destroy(key)
       self.responses.delete(key)
     end
