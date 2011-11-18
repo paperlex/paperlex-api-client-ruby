@@ -11,6 +11,10 @@ describe Paperlex::Contract do
     end
   end
 
+  def create_contract
+    Paperlex::Contract.create("body" => @body,"subject" => @subject,"number_of_signers" => 2)
+  end
+
   describe ".all" do
     before do
       unless Paperlex.token
@@ -20,7 +24,7 @@ describe Paperlex::Contract do
 
     it "should fetch all existing contracts" do
       @contracts = Paperlex::Contract.all
-      @contracts.size.should == 2
+      @contracts.size.should > 1
       @contracts.each do |contract|
         contract.created_at.should be_present
         contract.updated_at.should be_present
@@ -77,9 +81,12 @@ describe Paperlex::Contract do
 
   describe ".find" do
     before do
-      @uuid = "ce883764523af12e"
-      unless Paperlex.token
-        FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@uuid}.json?token=", :body => %{{"responses":null,"created_at":"2011-10-04T07:09:01Z","current_version":true,"body":"This Non-Disclosure Agreement (the **Agreement**) is made as of **{{effective_date}}** (the **Effective Date**) by and between **{{party_a}}**, reachable at **{{party_a_address}}**; and **{{party_b}}**", "uuid":"#{@uuid}", "updated_at":"2011-10-04T07:09:01Z", "signers":[{"uuid":"51c442d561291e5b","email":"jhahn@niveon.com"}], "locked":true, "subject":"NDA", "number_of_signers":2, "signatures":[{"created_at":"2011-10-05T00:47:18Z","uuid":"7559ad5cb0d36cf2","identity_verification_value":"555-555-1234","identity_verification_method":"SMS"}],"number_of_identity_verifications":1}}
+      if Paperlex.token
+        contract = create_contract
+        @uuid = contract.uuid
+      else
+        @uuid = "ce883764523af12e"
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@uuid}.json?token=", :body => %{{"responses":null,"created_at":"2011-10-04T07:09:01Z","current_version":true,"body":"This Non-Disclosure Agreement (the **Agreement**) is made as of **{{effective_date}}** (the **Effective Date**) by and between **{{party_a}}**, reachable at **{{party_a_address}}**; and **{{party_b}}**", "uuid":"#{@uuid}", "updated_at":"2011-10-04T07:09:01Z", "signers":[], "locked":true, "subject":"NDA", "number_of_signers":2, "signatures":[],"number_of_identity_verifications":1}}
       end
     end
 
@@ -91,9 +98,9 @@ describe Paperlex::Contract do
       @contract.uuid.should be_present
       @contract.current_version.should be_present
       @contract.body.should be_present
-      @contract.signatures.should be_present
+      @contract.signatures.should be_blank
       @contract.number_of_signers.should be_present
-      @contract.signers.should be_present
+      @contract.signers.should be_blank
     end
   end
 
@@ -109,7 +116,7 @@ describe Paperlex::Contract do
 
   describe "#save!" do
     before do
-      @contract = Paperlex::Contract.create("body" => @body,"subject" => @subject,"number_of_signers" => 2)
+      @contract = create_contract
       FakeWeb.register_uri :put, "#{Paperlex.base_url}/contracts/#{@contract.uuid}.json", :body => "{}"
     end
 
