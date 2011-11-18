@@ -66,6 +66,14 @@ module Paperlex
       self.responses[key] = Paperlex::Responses[uuid].fetch(key)
     end
 
+    def save_responses
+      Paperlex::Responses[uuid].update_all(responses)
+    end
+
+    def save_response(key)
+      Paperlex::Responses[uuid].update(key, responses[key])
+    end
+
     def delete_repsonse(key)
       Paperlex::Responses[uuid].destroy(key)
       self.responses.delete(key)
