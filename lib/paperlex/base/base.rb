@@ -3,20 +3,28 @@ module Paperlex
     property :uuid, :required => true
 
     class << self
+      def parse(result)
+        if result == "null"
+          nil
+        else
+          JSON.parse(result)
+        end
+      end
+
       def get(url, *attrs)
-        JSON.parse(RestClient.get("#{Paperlex.base_url}/#{url}?token=#{Paperlex.token}", *attrs))
+        parse(RestClient.get("#{Paperlex.base_url}/#{url}?token=#{Paperlex.token}", *attrs))
       end
 
       def post(url, attrs = {})
-        JSON.parse(RestClient.post("#{Paperlex.base_url}/#{url}", attrs.merge(:token => Paperlex.token)))
+        parse(RestClient.post("#{Paperlex.base_url}/#{url}", attrs.merge(:token => Paperlex.token)))
       end
 
       def put(url, attrs = {})
-        JSON.parse(RestClient.put("#{Paperlex.base_url}/#{url}", attrs.merge(:token => Paperlex.token)))
+        parse(RestClient.put("#{Paperlex.base_url}/#{url}", attrs.merge(:token => Paperlex.token)))
       end
 
       def delete(url, attrs = {})
-        JSON.parse(RestClient.delete("#{Paperlex.base_url}/#{url}", attrs.merge(:token => Paperlex.token)))
+        parse(RestClient.delete("#{Paperlex.base_url}/#{url}", attrs.merge(:token => Paperlex.token)))
       end
     end
 
