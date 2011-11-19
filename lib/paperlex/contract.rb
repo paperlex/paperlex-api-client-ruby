@@ -79,6 +79,19 @@ module Paperlex
       Paperlex::ReviewSession.create(attrs.merge(:contract_uuid => uuid))
     end
 
+    # Versions
+    def versions
+      Paperlex::Contract::Versions[uuid].all
+    end
+
+    def at_version(version_index)
+      new(Paperlex::Contract::Versions[uuid].fetch(version_index))
+    end
+
+    def revert_to_version(version_index)
+      new(Paperlex::Contract::Versions[uuid].revert_to(version_index))
+    end
+
     # Responses
     def update_responses
       self.responses = Paperlex::Responses[uuid].all
