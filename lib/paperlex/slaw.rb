@@ -34,5 +34,18 @@ module Paperlex
     def destroy
       self.class.delete(self.class.url_for(uuid))
     end
+
+    # Versions
+    def versions
+      Paperlex::Slaw::Versions[uuid].all
+    end
+
+    def at_version(version_index)
+      new(Paperlex::Slaw::Versions[uuid].fetch(version_index))
+    end
+
+    def revert_to_version(version_index)
+      new(Paperlex::Slaw::Versions[uuid].revert_to(version_index))
+    end
   end
 end
