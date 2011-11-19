@@ -2,6 +2,9 @@ module Paperlex
   class Contract < Base
     include RootObject
 
+    extend ActiveSupport::Autoload
+    autoload :Signers
+
     # Provided by index
     property :created_at
     property :updated_at
@@ -51,8 +54,24 @@ module Paperlex
 
     # Signers
     def create_signer(attrs = {})
-      # TODO: we should make all signers instantiated as Paperlex::Signer objects, not just those added this way
-      self.signers << Paperlex::Signer.create(attrs.merge(:contract_uuid => uuid))
+      self.signers << Paperlex::Contract::Signers[uuid].create(attrs)
+    end
+
+    def fetch_signers
+      self.signers = Paperlex::Contract::Signers[uuid].all
+    end
+
+    def fetch_signer(signer_uuid)
+      signers.delete_if {|signer| signer['uuid'] == signer_uuid }
+      self.signers << Paperlex::Contract::Signers[uuid].find(signer_uuid)
+    end
+
+    def update_signer(signer_uuid, attrs)
+      Paperlex::Contract::Signers[uuid].update(signer_uuid, attrs)
+    end
+
+    def delete_signer(signer_uuid)
+      Paperlex::Contract::Signers[uuid].destroy(signer_uuid)
     end
 
     # Review Sessions

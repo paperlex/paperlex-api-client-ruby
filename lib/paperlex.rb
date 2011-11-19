@@ -17,7 +17,6 @@ module Paperlex
   end
   autoload :Contract
   autoload :Slaw
-  autoload :Signer
   autoload :ReviewSession
   autoload :Responses
 
