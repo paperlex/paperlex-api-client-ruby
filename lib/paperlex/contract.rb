@@ -53,8 +53,14 @@ module Paperlex
     end
 
     # Signers
+    def signers=(signers)
+      super(signers.map {|signer| Paperlex::Signer.new(signer) })
+    end
+
     def create_signer(attrs = {})
-      self.signers << Paperlex::Contract::Signers[uuid].create(attrs)
+      signer = Paperlex::Contract::Signers[uuid].create(attrs)
+      self.signers << signer
+      signer
     end
 
     def fetch_signers

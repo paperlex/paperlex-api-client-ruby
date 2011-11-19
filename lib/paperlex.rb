@@ -19,6 +19,7 @@ module Paperlex
   autoload :Slaw
   autoload :ReviewSession
   autoload :Responses
+  autoload :Signer
 
   SANDBOX_URL = 'https://sandbox.api.paperlex.com/v1'
   LIVE_URL = 'https://api.paperlex.com/v1'

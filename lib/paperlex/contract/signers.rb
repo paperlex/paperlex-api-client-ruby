@@ -18,7 +18,7 @@ module Paperlex
       def create(attrs = {})
         attrs.symbolize_keys!
         attrs.assert_valid_keys(CREATE_FIELDS)
-        self.class.post(collection_url, :signer => attrs).merge(:contract_uuid => contract_uuid)
+        Paperlex::Signer.new(self.class.post(collection_url, :signer => attrs).merge(:contract_uuid => contract_uuid))
       end
 
       def all

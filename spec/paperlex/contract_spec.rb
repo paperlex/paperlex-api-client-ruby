@@ -131,4 +131,20 @@ describe Paperlex::Contract do
       @contract.number_of_signers.should == 3
     end
   end
+
+  describe "#create_signer" do
+    before do
+      @contract = create_contract
+      @email = Faker::Internet.email
+      unless Paperlex.token
+        FakeWeb.register_uri :post, "#{Paperlex.base_url}/contracts/#{@contract_uuid}/signers.json", :body => "{\"uuid\":\"3ab109b11a083b31\",\"email\":\"#{@email}\"}"
+      end
+    end
+
+    it "should create a signer" do
+      signer = @contract.create_signer(:email => @email)
+      signer.email.should == @email
+      @contract.signers.should include(signer)
+    end
+  end
 end
