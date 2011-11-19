@@ -62,11 +62,12 @@ describe Paperlex::Contract do
 
     context "with signers do" do
       before do
+        @signers = [Faker::Internet.email, Faker::Internet.email]
+
         unless Paperlex.token
-          FakeWeb.register_uri :post, "#{Paperlex.base_url}/contracts/#{@contract_uuid}/signers.json", :body => "{\"uuid\":\"3ab109b11a083b31\",\"email\":\"janesmith@example.com\"}"
+          FakeWeb.register_uri :post, "#{Paperlex.base_url}/contracts/#{@contract_uuid}/signers.json", @signers.map {|signer_email| {:body => "{\"uuid\":\"#{SecureRandom.hex(16)}\",\"email\":\"#{signer_email}\"}"} }
         end
 
-        @signers = [Faker::Internet.email, Faker::Internet.email]
         @contract = Paperlex::Contract.create("body" => @body, "subject" => @subject, "number_of_signers" => 2, 'signers' => @signers)
       end
 
@@ -75,6 +76,9 @@ describe Paperlex::Contract do
       it "should create signers" do
         @contract.signers.should_not be_empty
         @contract.signatures.should be_empty
+        @contract.signers.zip(@signers).each do |signer, expected_signer|
+          signer.email.should == expected_signer
+        end
       end
     end
   end

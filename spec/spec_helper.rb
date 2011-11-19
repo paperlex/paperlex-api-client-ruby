@@ -1,5 +1,6 @@
 require 'bundler'
 require 'active_support/core_ext/object/blank'
+require 'securerandom'
 
 Bundler.require(:default, :development)
 
