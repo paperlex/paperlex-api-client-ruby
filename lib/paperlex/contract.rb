@@ -79,6 +79,23 @@ module Paperlex
       Paperlex::ReviewSession.create(attrs.merge(:contract_uuid => uuid))
     end
 
+    def fetch_review_session
+      self.review_sessions = Paperlex::Contract::ReviewSessions[uuid].all
+    end
+
+    def fetch_review_session(review_session_uuid)
+      review_sessions.delete_if {|review_session| review_session['uuid'] == review_session_uuid }
+      self.review_sessions << Paperlex::Contract::ReviewSessions[uuid].find(review_session_uuid)
+    end
+
+    def update_review_session(signer_uuid, attrs)
+      Paperlex::Contract::ReviewSessions[uuid].update(review_session_uuid, attrs)
+    end
+
+    def delete_review_session(review_session_uuid)
+      Paperlex::Contract::ReviewSessions[uuid].destroy(review_session_uuid)
+    end
+
     # Versions
     def versions
       Paperlex::Contract::Versions[uuid].all

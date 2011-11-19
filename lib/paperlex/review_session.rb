@@ -16,5 +16,7 @@ module Paperlex
         new(post("contracts/#{contract_uuid}/review_sessions.json", :review_session => attrs).merge(:contract_uuid => contract_uuid))
       end
     end
+
+    
   end
 end
