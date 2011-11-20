@@ -5,6 +5,7 @@ module Paperlex
     extend ActiveSupport::Autoload
     autoload :Signers
     autoload :Responses
+    autoload :ReviewSessions
 
     # Provided by index
     property :created_at
@@ -21,6 +22,7 @@ module Paperlex
     property :signers
     property :signatures
     property :signature_callback_url
+    property :review_sessions
 
     class << self
       def update_fields
@@ -89,24 +91,37 @@ module Paperlex
     end
 
     # Review Sessions
+    def review_sessions=(review_sessions)
+      self[:review_sessions] = review_sessions.map {|session| session.is_a?(Paperlex::ReviewSession) ? session : Paperlex::ReviewSession.new(session.merge(:contract_uuid => uuid)) }
+    end
+
     def create_review_session(attrs = {})
-      Paperlex::ReviewSession.create(attrs.merge(:contract_uuid => uuid))
+      session = ReviewSessions[:uuid].create(attrs.merge(:contract_uuid => uuid))
+      self.review_sessions << session
+      session
     end
 
     def fetch_review_session
       self.review_sessions = ReviewSessions[uuid].all
+      review_sessions
     end
 
     def fetch_review_session(review_session_uuid)
-      review_sessions.delete_if {|review_session| review_session['uuid'] == review_session_uuid }
-      self.review_sessions << ReviewSessions[uuid].find(review_session_uuid)
+      remove_review_session!(review_session_uuid)
+      new_session = ReviewSessions[uuid].find(review_session_uuid)
+      self.review_sessions << new_session
+      new_session
     end
 
-    def update_review_session(signer_uuid, attrs)
-      ReviewSessions[uuid].update(review_session_uuid, attrs)
+    def update_review_session(review_session_uuid, attrs)
+      remove_review_session!(review_session_uuid)
+      updated_session = ReviewSessions[uuid].update(review_session_uuid, attrs)
+      self.review_sessions << updated_session
+      updated_session
     end
 
     def delete_review_session(review_session_uuid)
+      remove_review_session!(review_session_uuid)
       ReviewSessions[uuid].destroy(review_session_uuid)
     end
 
@@ -150,6 +165,11 @@ module Paperlex
     def remove_signer!(signer_to_remove)
       signer_uuid = to_uuid(signer_to_remove)
       signers.delete_if {|signer| signer['uuid'] == signer_uuid }
+    end
+
+    def remove_review_session!(review_session_to_remove)
+      review_session_uuid = to_uuid(review_session_to_remove)
+      review_sessions.delete_if {|review_session| review_session['uuid'] == review_session_uuid }
     end
   end
 end

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Paperlex::ReviewSession do
+describe Paperlex::Contract::ReviewSessions do
   before do
     @contract_uuid = "4776f3b030afa70d"
     @email = Faker::Internet.email
@@ -13,7 +13,7 @@ describe Paperlex::ReviewSession do
   describe ".create" do
     context "with simple parameters" do
       before do
-        @review_session = Paperlex::ReviewSession.create("contract_uuid" => @contract_uuid,"email" => @email)
+        @review_session = Paperlex::Contract::ReviewSessions[@contract_uuid].create("email" => @email)
       end
 
       it "should create a review session" do
