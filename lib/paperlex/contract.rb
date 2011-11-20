@@ -83,6 +83,7 @@ module Paperlex
     end
 
     def delete_signer(signer_uuid)
+      signers.delete_if {|signer| signer['uuid'] == signer_uuid }
       Paperlex::Contract::Signers[uuid].destroy(signer_uuid)
     end
 

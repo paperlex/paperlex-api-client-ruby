@@ -215,4 +215,19 @@ describe Paperlex::Contract do
       @contract.signers.should_not include(@signer)
     end
   end
+
+  describe "#delete_signer" do
+    before do
+      @contract = create_contract(:signers => 2)
+    end
+
+    it "should delete the signer" do
+      @signer = @contract.signers.first
+      @other_signer = @contract.signers.last
+      FakeWeb.register_uri :delete, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/signers/#{@signer.uuid}.json", {:body => "{\"uuid\":\"#{@signer.uuid}\",\"email\":\"#{@signer.email}\"}" }
+      @contract.delete_signer(@signer.uuid)
+      @contract.signers.should_not include(@signer)
+      @contract.signers.should include(@other_signer)
+    end
+  end
 end
