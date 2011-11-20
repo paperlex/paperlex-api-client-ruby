@@ -1,13 +1,13 @@
 module Paperlex
   class Contract < Base
     class ReviewSessions < Paperlex::Base
+      include SubObject
+
       attr_reader :contract_uuid
 
-      CREATE_FIELDS = [:email, :expires_at, :expires_in]
-
       class << self
-        def [](contract_uuid)
-          new(contract_uuid)
+        def create_fields
+          [:email, :expires_at, :expires_in]
         end
       end
 
@@ -17,16 +17,8 @@ module Paperlex
 
       def create(attrs = {})
         attrs.symbolize_keys!
-        attrs.assert_valid_keys(CREATE_FIELDS)
+        attrs.assert_valid_keys(self.class.create_fields)
         self.class.post(collection_url, :signer => attrs).merge(:contract_uuid => contract_uuid)
-      end
-
-      def all
-        self.class.get(collection_url)
-      end
-
-      def find(uuid)
-        self.class.get(url_for(uuid))
       end
 
       def update(uuid, attrs)

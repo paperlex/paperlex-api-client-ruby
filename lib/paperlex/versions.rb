@@ -1,23 +1,11 @@
 module Paperlex
   class Versions < Base
-    class << self
-      def [](uuid)
-        new(uuid)
-      end
-    end
+    include SubObject
 
     attr_reader :uuid
 
     def initialize(uuid)
       @uuid = uuid
-    end
-
-    def all
-      get(collection_url)
-    end
-
-    def find(version_index)
-      get(url_for(version_index))
     end
 
     def revert_to(version_index)

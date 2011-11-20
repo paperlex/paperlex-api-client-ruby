@@ -1,19 +1,11 @@
 module Paperlex
   class Responses
-    attr_reader :contract_uuid
+    include SubObject
 
-    class << self
-      def [](contract_uuid)
-        new(contract_uuid)
-      end      
-    end
+    attr_reader :contract_uuid
 
     def initialize(contract_uuid)
       @contract_uuid = contract_uuid
-    end
-
-    def all
-      get(collection_url)
     end
 
     def update_all(responses)
@@ -21,7 +13,7 @@ module Paperlex
     end
 
     def find(key)
-      get(url_for(key)).first
+      super.first
     end
 
     def update(key, value)

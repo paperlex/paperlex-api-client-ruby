@@ -14,6 +14,7 @@ module Paperlex
   autoload_under 'base' do
     autoload :Base
     autoload :RootObject
+    autoload :SubObject
   end
   autoload :Contract
   autoload :Slaw
