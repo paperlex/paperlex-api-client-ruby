@@ -16,7 +16,7 @@ module Paperlex
       get(collection_url)
     end
 
-    def fetch(version_index)
+    def find(version_index)
       get(url_for(version_index))
     end
 

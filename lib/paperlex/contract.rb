@@ -115,7 +115,7 @@ module Paperlex
     end
 
     def at_version(version_index)
-      new(Paperlex::Contract::Versions[uuid].fetch(version_index))
+      new(Paperlex::Contract::Versions[uuid].find(version_index))
     end
 
     def revert_to_version(version_index)
@@ -128,7 +128,7 @@ module Paperlex
     end
 
     def update_response(key)
-      self.responses[key] = Paperlex::Responses[uuid].fetch(key)
+      self.responses[key] = Paperlex::Responses[uuid].find(key)
     end
 
     def save_responses

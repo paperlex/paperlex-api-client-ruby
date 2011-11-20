@@ -41,7 +41,7 @@ module Paperlex
     end
 
     def at_version(version_index)
-      new(Paperlex::Slaw::Versions[uuid].fetch(version_index))
+      new(Paperlex::Slaw::Versions[uuid].find(version_index))
     end
 
     def revert_to_version(version_index)

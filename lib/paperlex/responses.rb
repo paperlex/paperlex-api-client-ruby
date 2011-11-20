@@ -20,7 +20,7 @@ module Paperlex
       post(collection_url, {:responses => responses})
     end
 
-    def fetch(key)
+    def find(key)
       get(url_for(key)).first
     end
 
