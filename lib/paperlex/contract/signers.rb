@@ -26,7 +26,7 @@ module Paperlex
       end
 
       def find(uuid)
-        self.class.get(url_for(uuid))
+        Paperlex::Signer.new(self.class.get(url_for(uuid)).merge(:contract_uuid => contract_uuid))
       end
 
       def update(uuid, attrs)

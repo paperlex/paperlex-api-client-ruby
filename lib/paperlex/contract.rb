@@ -54,7 +54,7 @@ module Paperlex
 
     # Signers
     def signers=(signers)
-      self[:signers] = signers.map {|signer| Paperlex::Signer.new(signer.merge(:contract_uuid => uuid)) }
+      self[:signers] = signers.map {|signer| signer.is_a?(Paperlex::Signer) ? signer : Paperlex::Signer.new(signer.merge(:contract_uuid => uuid)) }
     end
 
     def create_signer(attrs = {})
@@ -70,7 +70,9 @@ module Paperlex
 
     def fetch_signer(signer_uuid)
       signers.delete_if {|signer| signer['uuid'] == signer_uuid }
-      self.signers << Paperlex::Contract::Signers[uuid].find(signer_uuid)
+      new_signer = Paperlex::Contract::Signers[uuid].find(signer_uuid)
+      self.signers << new_signer
+      self.signers.last
     end
 
     def update_signer(signer_uuid, attrs)

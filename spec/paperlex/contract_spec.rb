@@ -11,8 +11,18 @@ describe Paperlex::Contract do
     end
   end
 
-  def create_contract
-    Paperlex::Contract.create("body" => @body,"subject" => @subject,"number_of_signers" => 2)
+  def create_contract(args = {})
+    if signer_count = args[:signers]
+      signer_count = Integer(signer_count)
+      args[:signers] = signers = signer_count.times.map do
+        Faker::Internet.email
+      end
+
+      unless Paperlex.token
+        FakeWeb.register_uri :post, "#{Paperlex.base_url}/contracts/#{@contract_uuid}/signers.json", signers.map {|signer_email| {:body => "{\"uuid\":\"#{SecureRandom.hex(16)}\",\"email\":\"#{signer_email}\"}"} }
+      end
+    end
+    contract = Paperlex::Contract.create({"body" => @body,"subject" => @subject,"number_of_signers" => 2}.merge(args))
   end
 
   describe ".all" do
@@ -169,6 +179,23 @@ describe Paperlex::Contract do
       @signers.should be_present
       @signers.length.should == 2
       @signers.map {|signer| signer.email }.should =~ @signer_emails
+    end
+  end
+
+  describe "#fetch_signer" do
+    before do
+      @contract = create_contract(:signers => 2)
+    end
+
+    it "should update the signer" do
+      @signer = @contract.signers.first
+      @new_email = Faker::Internet.email
+      @signer.email.should_not == @new_email
+      FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/signers/#{@signer.uuid}.json?token=", {:body => "{\"uuid\":\"#{@signer.uuid}\",\"email\":\"#{@new_email}\"}" }
+      @new_signer = @contract.fetch_signer(@signer.uuid)
+      @new_signer.email.should == @new_email
+      @contract.signers.should include(@new_signer)
+      @contract.signers.should_not include(@signer)
     end
   end
 end
