@@ -151,4 +151,24 @@ describe Paperlex::Contract do
       @contract.signers.should include(signer)
     end
   end
+
+  describe "#fetch_signers" do
+    before do
+      @contract = create_contract
+      @signer_emails = [Faker::Internet.email, Faker::Internet.email]
+
+      unless Paperlex.token
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/signers.json?token=", {:body => "[#{@signer_emails.map {|signer_email|  "{\"uuid\":\"#{SecureRandom.hex(16)}\",\"email\":\"#{signer_email}\"}"}.join(", ")}]" }
+      end
+    end
+
+    it "should update the signers" do
+      @contract.signers.should be_empty
+      @signers = @contract.fetch_signers
+      @contract.signers.should == @signers
+      @signers.should be_present
+      @signers.length.should == 2
+      @signers.map {|signer| signer.email }.should =~ @signer_emails
+    end
+  end
 end
