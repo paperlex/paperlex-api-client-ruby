@@ -25,12 +25,16 @@ module Paperlex
         self.class.get(collection_url)
       end
 
+      def new_signer(attrs)
+        Paperlex::Signer.new(attrs.merge(:contract_uuid => contract_uuid))
+      end
+
       def find(uuid)
-        Paperlex::Signer.new(self.class.get(url_for(uuid)).merge(:contract_uuid => contract_uuid))
+        new_signer(self.class.get(url_for(uuid)))
       end
 
       def update(uuid, attrs)
-        self.class.put(url_for(uuid), :signer => attrs)
+        new_signer(self.class.put(url_for(uuid), :signer => attrs))
       end
 
       def destroy(uuid)

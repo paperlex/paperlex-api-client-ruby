@@ -187,12 +187,29 @@ describe Paperlex::Contract do
       @contract = create_contract(:signers => 2)
     end
 
-    it "should update the signer" do
+    it "should fetch the new signer data" do
       @signer = @contract.signers.first
       @new_email = Faker::Internet.email
       @signer.email.should_not == @new_email
       FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/signers/#{@signer.uuid}.json?token=", {:body => "{\"uuid\":\"#{@signer.uuid}\",\"email\":\"#{@new_email}\"}" }
       @new_signer = @contract.fetch_signer(@signer.uuid)
+      @new_signer.email.should == @new_email
+      @contract.signers.should include(@new_signer)
+      @contract.signers.should_not include(@signer)
+    end
+  end
+
+  describe "#update_signer" do
+    before do
+      @contract = create_contract(:signers => 2)
+    end
+
+    it "should update the signer" do
+      @signer = @contract.signers.first
+      @new_email = Faker::Internet.email
+      @signer.email.should_not == @new_email
+      FakeWeb.register_uri :put, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/signers/#{@signer.uuid}.json", {:body => "{\"uuid\":\"#{@signer.uuid}\",\"email\":\"#{@new_email}\"}" }
+      @new_signer = @contract.update_signer(@signer.uuid, {:email => @new_email})
       @new_signer.email.should == @new_email
       @contract.signers.should include(@new_signer)
       @contract.signers.should_not include(@signer)

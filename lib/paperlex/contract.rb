@@ -72,11 +72,14 @@ module Paperlex
       signers.delete_if {|signer| signer['uuid'] == signer_uuid }
       new_signer = Paperlex::Contract::Signers[uuid].find(signer_uuid)
       self.signers << new_signer
-      self.signers.last
+      new_signer
     end
 
     def update_signer(signer_uuid, attrs)
-      Paperlex::Contract::Signers[uuid].update(signer_uuid, attrs)
+      signers.delete_if {|signer| signer['uuid'] == signer_uuid }
+      updated_signer = Paperlex::Contract::Signers[uuid].update(signer_uuid, attrs)
+      self.signers << updated_signer
+      updated_signer
     end
 
     def delete_signer(signer_uuid)
