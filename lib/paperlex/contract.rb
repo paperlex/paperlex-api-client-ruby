@@ -59,33 +59,33 @@ module Paperlex
     end
 
     def create_signer(attrs = {})
-      signer = Paperlex::Contract::Signers[uuid].create(attrs)
+      signer = Signers[uuid].create(attrs)
       self.signers << signer
       signer
     end
 
     def fetch_signers
-      self.signers = Paperlex::Contract::Signers[uuid].all
+      self.signers = Signers[uuid].all
       signers
     end
 
     def fetch_signer(signer)
       remove_signer!(signer)
-      new_signer = Paperlex::Contract::Signers[uuid].find(signer)
+      new_signer = Signers[uuid].find(signer)
       self.signers << new_signer
       new_signer
     end
 
     def update_signer(signer, attrs)
       remove_signer!(signer)
-      updated_signer = Paperlex::Contract::Signers[uuid].update(signer, attrs)
+      updated_signer = Signers[uuid].update(signer, attrs)
       self.signers << updated_signer
       updated_signer
     end
 
     def delete_signer(signer)
       remove_signer!(signer)
-      Paperlex::Contract::Signers[uuid].destroy(signer)
+      Signers[uuid].destroy(signer)
     end
 
     # Review Sessions
@@ -94,54 +94,54 @@ module Paperlex
     end
 
     def fetch_review_session
-      self.review_sessions = Paperlex::Contract::ReviewSessions[uuid].all
+      self.review_sessions = ReviewSessions[uuid].all
     end
 
     def fetch_review_session(review_session_uuid)
       review_sessions.delete_if {|review_session| review_session['uuid'] == review_session_uuid }
-      self.review_sessions << Paperlex::Contract::ReviewSessions[uuid].find(review_session_uuid)
+      self.review_sessions << ReviewSessions[uuid].find(review_session_uuid)
     end
 
     def update_review_session(signer_uuid, attrs)
-      Paperlex::Contract::ReviewSessions[uuid].update(review_session_uuid, attrs)
+      ReviewSessions[uuid].update(review_session_uuid, attrs)
     end
 
     def delete_review_session(review_session_uuid)
-      Paperlex::Contract::ReviewSessions[uuid].destroy(review_session_uuid)
+      ReviewSessions[uuid].destroy(review_session_uuid)
     end
 
     # Versions
     def versions
-      Paperlex::Contract::Versions[uuid].all
+      Versions[uuid].all
     end
 
     def at_version(version_index)
-      new(Paperlex::Contract::Versions[uuid].find(version_index))
+      new(Versions[uuid].find(version_index))
     end
 
     def revert_to_version(version_index)
-      new(Paperlex::Contract::Versions[uuid].revert_to(version_index))
+      new(Versions[uuid].revert_to(version_index))
     end
 
     # Responses
     def update_responses
-      self.responses = Paperlex::Contract::Responses[uuid].all
+      self.responses = Responses[uuid].all
     end
 
     def update_response(key)
-      self.responses[key] = Paperlex::Contract::Responses[uuid].find(key)
+      self.responses[key] = Responses[uuid].find(key)
     end
 
     def save_responses
-      Paperlex::Contract::Responses[uuid].update_all(responses)
+      Responses[uuid].update_all(responses)
     end
 
     def save_response(key)
-      Paperlex::Contract::Responses[uuid].update(key, responses[key])
+      Responses[uuid].update(key, responses[key])
     end
 
     def delete_response(key)
-      Paperlex::Contract::Responses[uuid].destroy(key)
+      Responses[uuid].destroy(key)
       self.responses.delete(key)
     end
 
