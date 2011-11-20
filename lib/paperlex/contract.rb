@@ -4,6 +4,7 @@ module Paperlex
 
     extend ActiveSupport::Autoload
     autoload :Signers
+    autoload :Responses
 
     # Provided by index
     property :created_at
@@ -124,23 +125,23 @@ module Paperlex
 
     # Responses
     def update_responses
-      self.responses = Paperlex::Responses[uuid].all
+      self.responses = Paperlex::Contract::Responses[uuid].all
     end
 
     def update_response(key)
-      self.responses[key] = Paperlex::Responses[uuid].find(key)
+      self.responses[key] = Paperlex::Contract::Responses[uuid].find(key)
     end
 
     def save_responses
-      Paperlex::Responses[uuid].update_all(responses)
+      Paperlex::Contract::Responses[uuid].update_all(responses)
     end
 
     def save_response(key)
-      Paperlex::Responses[uuid].update(key, responses[key])
+      Paperlex::Contract::Responses[uuid].update(key, responses[key])
     end
 
     def delete_response(key)
-      Paperlex::Responses[uuid].destroy(key)
+      Paperlex::Contract::Responses[uuid].destroy(key)
       self.responses.delete(key)
     end
 

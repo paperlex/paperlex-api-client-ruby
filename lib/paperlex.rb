@@ -19,7 +19,6 @@ module Paperlex
   autoload :Contract
   autoload :Slaw
   autoload :ReviewSession
-  autoload :Responses
   autoload :Signer
 
   SANDBOX_URL = 'https://sandbox.api.paperlex.com/v1'
