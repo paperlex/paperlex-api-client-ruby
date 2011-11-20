@@ -48,7 +48,7 @@ module Paperlex
       end
 
       def url_for(uuid)
-        "contracts/#{contract_uuid}/signers/#{uuid}.json"
+        "contracts/#{contract_uuid}/signers/#{to_uuid(uuid)}.json"
       end
     end
   end

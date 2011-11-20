@@ -68,23 +68,23 @@ module Paperlex
       signers
     end
 
-    def fetch_signer(signer_uuid)
-      signers.delete_if {|signer| signer['uuid'] == signer_uuid }
-      new_signer = Paperlex::Contract::Signers[uuid].find(signer_uuid)
+    def fetch_signer(signer)
+      remove_signer!(signer)
+      new_signer = Paperlex::Contract::Signers[uuid].find(signer)
       self.signers << new_signer
       new_signer
     end
 
-    def update_signer(signer_uuid, attrs)
-      signers.delete_if {|signer| signer['uuid'] == signer_uuid }
-      updated_signer = Paperlex::Contract::Signers[uuid].update(signer_uuid, attrs)
+    def update_signer(signer, attrs)
+      remove_signer!(signer)
+      updated_signer = Paperlex::Contract::Signers[uuid].update(signer, attrs)
       self.signers << updated_signer
       updated_signer
     end
 
-    def delete_signer(signer_uuid)
-      signers.delete_if {|signer| signer['uuid'] == signer_uuid }
-      Paperlex::Contract::Signers[uuid].destroy(signer_uuid)
+    def delete_signer(signer)
+      remove_signer!(signer)
+      Paperlex::Contract::Signers[uuid].destroy(signer)
     end
 
     # Review Sessions
@@ -142,6 +142,13 @@ module Paperlex
     def delete_response(key)
       Paperlex::Responses[uuid].destroy(key)
       self.responses.delete(key)
+    end
+
+    private
+
+    def remove_signer!(signer_to_remove)
+      signer_uuid = to_uuid(signer_to_remove)
+      signers.delete_if {|signer| signer['uuid'] == signer_uuid }
     end
   end
 end

@@ -187,15 +187,32 @@ describe Paperlex::Contract do
       @contract = create_contract(:signers => 2)
     end
 
-    it "should fetch the new signer data" do
-      @signer = @contract.signers.first
-      @new_email = Faker::Internet.email
-      @signer.email.should_not == @new_email
-      FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/signers/#{@signer.uuid}.json?token=", {:body => "{\"uuid\":\"#{@signer.uuid}\",\"email\":\"#{@new_email}\"}" }
-      @new_signer = @contract.fetch_signer(@signer.uuid)
-      @new_signer.email.should == @new_email
-      @contract.signers.should include(@new_signer)
-      @contract.signers.should_not include(@signer)
+    shared_examples_for "successful signer fetch" do
+      it "should fetch the new signer data" do
+        @new_email = Faker::Internet.email
+        @signer.email.should_not == @new_email
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/signers/#{@signer.uuid}.json?token=", {:body => "{\"uuid\":\"#{@signer.uuid}\",\"email\":\"#{@new_email}\"}" }
+        @new_signer = @contract.fetch_signer(@identifier)
+        @new_signer.email.should == @new_email
+        @contract.signers.should include(@new_signer)
+        @contract.signers.should_not include(@signer)
+      end
+    end
+
+    context "when provided a uuid" do
+      before do
+        @signer = @contract.signers.first
+        @identifier = @signer.uuid
+      end
+      it_should_behave_like "successful signer fetch"
+    end
+
+    context "when provided a signer" do
+      before do
+        @signer = @contract.signers.first
+        @identifier = @signer
+      end
+      it_should_behave_like "successful signer fetch"
     end
   end
 
@@ -204,15 +221,32 @@ describe Paperlex::Contract do
       @contract = create_contract(:signers => 2)
     end
 
-    it "should update the signer" do
-      @signer = @contract.signers.first
-      @new_email = Faker::Internet.email
-      @signer.email.should_not == @new_email
-      FakeWeb.register_uri :put, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/signers/#{@signer.uuid}.json", {:body => "{\"uuid\":\"#{@signer.uuid}\",\"email\":\"#{@new_email}\"}" }
-      @new_signer = @contract.update_signer(@signer.uuid, {:email => @new_email})
-      @new_signer.email.should == @new_email
-      @contract.signers.should include(@new_signer)
-      @contract.signers.should_not include(@signer)
+    shared_examples_for "successful signer update" do
+      it "should update the signer" do
+        @new_email = Faker::Internet.email
+        @signer.email.should_not == @new_email
+        FakeWeb.register_uri :put, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/signers/#{@signer.uuid}.json", {:body => "{\"uuid\":\"#{@signer.uuid}\",\"email\":\"#{@new_email}\"}" }
+        @new_signer = @contract.update_signer(@identifier, {:email => @new_email})
+        @new_signer.email.should == @new_email
+        @contract.signers.should include(@new_signer)
+        @contract.signers.should_not include(@signer)
+      end
+    end
+
+    context "when provided a uuid" do
+      before do
+        @signer = @contract.signers.first
+        @identifier = @signer.uuid
+      end
+      it_should_behave_like "successful signer update"
+    end
+
+    context "when provided a signer" do
+      before do
+        @signer = @contract.signers.first
+        @identifier = @signer
+      end
+      it_should_behave_like "successful signer update"
     end
   end
 
@@ -221,13 +255,31 @@ describe Paperlex::Contract do
       @contract = create_contract(:signers => 2)
     end
 
-    it "should delete the signer" do
-      @signer = @contract.signers.first
-      @other_signer = @contract.signers.last
-      FakeWeb.register_uri :delete, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/signers/#{@signer.uuid}.json", {:body => "{\"uuid\":\"#{@signer.uuid}\",\"email\":\"#{@signer.email}\"}" }
-      @contract.delete_signer(@signer.uuid)
-      @contract.signers.should_not include(@signer)
-      @contract.signers.should include(@other_signer)
+    shared_examples_for "successful signer delete" do
+      it "should delete the signer" do
+        @signer = @contract.signers.first
+        @other_signer = @contract.signers.last
+        FakeWeb.register_uri :delete, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/signers/#{@signer.uuid}.json", {:body => "{\"uuid\":\"#{@signer.uuid}\",\"email\":\"#{@signer.email}\"}" }
+        @contract.delete_signer(@identifier)
+        @contract.signers.should_not include(@signer)
+        @contract.signers.should include(@other_signer)
+      end
+    end
+
+    context "when provided a uuid" do
+      before do
+        @signer = @contract.signers.first
+        @identifier = @signer.uuid
+      end
+      it_should_behave_like "successful signer delete"
+    end
+
+    context "when provided a signer" do
+      before do
+        @signer = @contract.signers.first
+        @identifier = @signer
+      end
+      it_should_behave_like "successful signer delete"
     end
   end
 end
