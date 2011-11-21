@@ -105,7 +105,7 @@ module Paperlex
       session
     end
 
-    def fetch_review_session
+    def fetch_review_sessions
       self.review_sessions = ReviewSessions[uuid].all
       review_sessions
     end

@@ -305,7 +305,7 @@ describe Paperlex::Contract do
       @review_session_emails = [Faker::Internet.email, Faker::Internet.email]
 
       unless Paperlex.token
-        FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions.json?token=", {:body => "[#{@review_session_emails.map {|review_session_email|  "{\"uuid\":\"#{SecureRandom.hex(16)}\",\"email\":\"#{review_session_email}\"}"}.join(", ")}]" }
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions.json?token=", {:body => "[#{@review_session_emails.map {|review_session_email|  %{{"expires_at":"2011-10-05T07:10:03Z","uuid":"#{SecureRandom.hex(16)}","token":"#{SecureRandom.hex(16)}","url":"https://sandbox.api.paperlex.com/v1/contracts/#{@contract.uuid}/review?token=#{SecureRandom.hex(16)}","email":"#{review_session_email}\"}}}.join(", ")}]" }
       end
     end
 
@@ -315,7 +315,14 @@ describe Paperlex::Contract do
       @contract.review_sessions.should == @review_sessions
       @review_sessions.should be_present
       @review_sessions.length.should == 2
-      @review_sessions.map {|review_session| review_session.email }.should =~ @review_session_emails
+      @review_sessions.each do |review_session|
+        @review_session_emails.should include(review_session.email)
+        review_session.uuid.should be_present
+        review_session.token.should be_present
+        review_session.url.should be_present
+        review_session.email.should be_present
+        review_session.expires_at.should be_present
+      end
     end
   end
 
