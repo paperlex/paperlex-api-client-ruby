@@ -329,13 +329,14 @@ describe Paperlex::Contract do
   describe "#fetch_review_session" do
     before do
       @contract = create_contract
+      @contract.create_review_session(:email => Faker::Internet.email)
     end
 
     shared_examples_for "successful review_session fetch" do
       it "should fetch the new review_session data" do
         @new_email = Faker::Internet.email
         @review_session.email.should_not == @new_email
-        FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions/#{@review_session.uuid}.json?token=", {:body => "{\"uuid\":\"#{@review_session.uuid}\",\"email\":\"#{@new_email}\"}" }
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions/#{@review_session.uuid}.json?token=", {:body => %{{"expires_at":"2011-10-05T07:10:03Z","uuid":"#{@review_session.uuid}","token":"#{@review_session.token}","url":"https://sandbox.api.paperlex.com/v1/contracts/ce883764523af12e/review?token=71fcd58ed9735cad","email":"#{@new_email}"}} }
         @new_review_session = @contract.fetch_review_session(@identifier)
         @new_review_session.email.should == @new_email
         @contract.review_sessions.should include(@new_review_session)
@@ -363,13 +364,14 @@ describe Paperlex::Contract do
   describe "#update_review_session" do
     before do
       @contract = create_contract
+      @contract.create_review_session(:email => Faker::Internet.email)
     end
 
     shared_examples_for "successful review_session update" do
       it "should update the review_session" do
         @new_email = Faker::Internet.email
         @review_session.email.should_not == @new_email
-        FakeWeb.register_uri :put, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions/#{@review_session.uuid}.json", {:body => "{\"uuid\":\"#{@review_session.uuid}\",\"email\":\"#{@new_email}\"}" }
+        FakeWeb.register_uri :put, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions/#{@review_session.uuid}.json", {:body => %{{"expires_at":"2011-10-05T07:10:03Z","uuid":"#{@review_session.uuid}","token":"#{@review_session.token}","url":"https://sandbox.api.paperlex.com/v1/contracts/ce883764523af12e/review?token=71fcd58ed9735cad","email":"#{@new_email}"}} }
         @new_review_session = @contract.update_review_session(@identifier, {:email => @new_email})
         @new_review_session.email.should == @new_email
         @contract.review_sessions.should include(@new_review_session)
@@ -397,13 +399,14 @@ describe Paperlex::Contract do
   describe "#delete_review_session" do
     before do
       @contract = create_contract
+      @contract.create_review_session(:email => Faker::Internet.email)
     end
 
     shared_examples_for "successful review_session delete" do
       it "should delete the review_session" do
         @review_session = @contract.review_sessions.first
         @other_review_session = @contract.review_sessions.last
-        FakeWeb.register_uri :delete, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions/#{@review_session.uuid}.json", {:body => "{\"uuid\":\"#{@review_session.uuid}\",\"email\":\"#{@review_session.email}\"}" }
+        FakeWeb.register_uri :delete, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions/#{@review_session.uuid}.json", {:body => %{{"expires_at":"2011-10-05T07:10:03Z","uuid":"#{@review_session.uuid}","token":"#{@review_session.token}","url":"https://sandbox.api.paperlex.com/v1/contracts/ce883764523af12e/review?token=71fcd58ed9735cad","email":"#{@review_session.email}"}} }
         @contract.delete_review_session(@identifier)
         @contract.review_sessions.should_not include(@review_session)
         @contract.review_sessions.should include(@other_review_session)
