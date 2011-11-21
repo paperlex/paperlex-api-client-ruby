@@ -405,11 +405,10 @@ describe Paperlex::Contract do
     shared_examples_for "successful review_session delete" do
       it "should delete the review_session" do
         @review_session = @contract.review_sessions.first
-        @other_review_session = @contract.review_sessions.last
         FakeWeb.register_uri :delete, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions/#{@review_session.uuid}.json", {:body => %{{"expires_at":"2011-10-05T07:10:03Z","uuid":"#{@review_session.uuid}","token":"#{@review_session.token}","url":"https://sandbox.api.paperlex.com/v1/contracts/ce883764523af12e/review?token=71fcd58ed9735cad","email":"#{@review_session.email}"}} }
         @contract.delete_review_session(@identifier)
         @contract.review_sessions.should_not include(@review_session)
-        @contract.review_sessions.should include(@other_review_session)
+        @contract.review_sessions.should be_empty
       end
     end
 
