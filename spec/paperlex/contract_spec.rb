@@ -282,4 +282,141 @@ describe Paperlex::Contract do
       it_should_behave_like "successful signer delete"
     end
   end
+
+  describe "#create_review_session" do
+    before do
+      @contract = create_contract
+      @email = Faker::Internet.email
+      unless Paperlex.token
+        FakeWeb.register_uri :post, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions.json", :body => %{{"expires_at":"2011-10-05T07:10:03Z","uuid":"d9df3765905e7695","token":"71fcd58ed9735cad","url":"https://sandbox.api.paperlex.com/v1/contracts/ce883764523af12e/review?token=71fcd58ed9735cad","email":"#{@email}"}}
+      end
+    end
+
+    it "should create a review_session" do
+      review_session = @contract.create_review_session(:email => @email)
+      review_session.email.should == @email
+      @contract.review_sessions.should include(review_session)
+    end
+  end
+
+  describe "#fetch_review_sessions" do
+    before do
+      @contract = create_contract
+      @review_session_emails = [Faker::Internet.email, Faker::Internet.email]
+
+      unless Paperlex.token
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions.json?token=", {:body => "[#{@review_session_emails.map {|review_session_email|  "{\"uuid\":\"#{SecureRandom.hex(16)}\",\"email\":\"#{review_session_email}\"}"}.join(", ")}]" }
+      end
+    end
+
+    it "should update the review_sessions" do
+      @contract.review_sessions.should be_empty
+      @review_sessions = @contract.fetch_review_sessions
+      @contract.review_sessions.should == @review_sessions
+      @review_sessions.should be_present
+      @review_sessions.length.should == 2
+      @review_sessions.map {|review_session| review_session.email }.should =~ @review_session_emails
+    end
+  end
+
+  describe "#fetch_review_session" do
+    before do
+      @contract = create_contract
+    end
+
+    shared_examples_for "successful review_session fetch" do
+      it "should fetch the new review_session data" do
+        @new_email = Faker::Internet.email
+        @review_session.email.should_not == @new_email
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions/#{@review_session.uuid}.json?token=", {:body => "{\"uuid\":\"#{@review_session.uuid}\",\"email\":\"#{@new_email}\"}" }
+        @new_review_session = @contract.fetch_review_session(@identifier)
+        @new_review_session.email.should == @new_email
+        @contract.review_sessions.should include(@new_review_session)
+        @contract.review_sessions.should_not include(@review_session)
+      end
+    end
+
+    context "when provided a uuid" do
+      before do
+        @review_session = @contract.review_sessions.first
+        @identifier = @review_session.uuid
+      end
+      it_should_behave_like "successful review_session fetch"
+    end
+
+    context "when provided a review_session" do
+      before do
+        @review_session = @contract.review_sessions.first
+        @identifier = @review_session
+      end
+      it_should_behave_like "successful review_session fetch"
+    end
+  end
+
+  describe "#update_review_session" do
+    before do
+      @contract = create_contract
+    end
+
+    shared_examples_for "successful review_session update" do
+      it "should update the review_session" do
+        @new_email = Faker::Internet.email
+        @review_session.email.should_not == @new_email
+        FakeWeb.register_uri :put, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions/#{@review_session.uuid}.json", {:body => "{\"uuid\":\"#{@review_session.uuid}\",\"email\":\"#{@new_email}\"}" }
+        @new_review_session = @contract.update_review_session(@identifier, {:email => @new_email})
+        @new_review_session.email.should == @new_email
+        @contract.review_sessions.should include(@new_review_session)
+        @contract.review_sessions.should_not include(@review_session)
+      end
+    end
+
+    context "when provided a uuid" do
+      before do
+        @review_session = @contract.review_sessions.first
+        @identifier = @review_session.uuid
+      end
+      it_should_behave_like "successful review_session update"
+    end
+
+    context "when provided a review_session" do
+      before do
+        @review_session = @contract.review_sessions.first
+        @identifier = @review_session
+      end
+      it_should_behave_like "successful review_session update"
+    end
+  end
+
+  describe "#delete_review_session" do
+    before do
+      @contract = create_contract
+    end
+
+    shared_examples_for "successful review_session delete" do
+      it "should delete the review_session" do
+        @review_session = @contract.review_sessions.first
+        @other_review_session = @contract.review_sessions.last
+        FakeWeb.register_uri :delete, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions/#{@review_session.uuid}.json", {:body => "{\"uuid\":\"#{@review_session.uuid}\",\"email\":\"#{@review_session.email}\"}" }
+        @contract.delete_review_session(@identifier)
+        @contract.review_sessions.should_not include(@review_session)
+        @contract.review_sessions.should include(@other_review_session)
+      end
+    end
+
+    context "when provided a uuid" do
+      before do
+        @review_session = @contract.review_sessions.first
+        @identifier = @review_session.uuid
+      end
+      it_should_behave_like "successful review_session delete"
+    end
+
+    context "when provided a review_session" do
+      before do
+        @review_session = @contract.review_sessions.first
+        @identifier = @review_session
+      end
+      it_should_behave_like "successful review_session delete"
+    end
+  end
 end

@@ -95,8 +95,12 @@ module Paperlex
       self[:review_sessions] = review_sessions.map {|session| session.is_a?(Paperlex::ReviewSession) ? session : Paperlex::ReviewSession.new(session.merge(:contract_uuid => uuid)) }
     end
 
+    def review_sessions
+      self[:review_sessions] ||= []
+    end
+
     def create_review_session(attrs = {})
-      session = ReviewSessions[:uuid].create(attrs.merge(:contract_uuid => uuid))
+      session = ReviewSessions[uuid].create(attrs)
       self.review_sessions << session
       session
     end
