@@ -13,15 +13,15 @@ module Paperlex
     end
 
     def all
-      get(collection_url)
+      self.class.get(collection_url)
     end
 
     def find(version_index)
-      get(url_for(version_index))
+      self.class.get(url_for(version_index))
     end
 
     def revert_to(version_index)
-      post("#{base}/#{uuid}/versions/#{version_index}/revert.json")
+      self.class.post("#{base}/#{uuid}/versions/#{version_index}/revert.json")
     end
 
     private

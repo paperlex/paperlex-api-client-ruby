@@ -428,4 +428,55 @@ describe Paperlex::Contract do
       it_should_behave_like "successful review_session delete"
     end
   end
+
+  describe "#versions" do
+    before do
+      @contract = create_contract
+    end
+
+    it "should return details of the various versions of the contract" do
+      FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/versions.json?token=", :body => %{[{"version":1,"event":"update"},{"version":2,"event":"update"},{"version":3,"event":"update"}]}
+      versions = @contract.versions
+      versions.size.should == 3
+      versions.each do |version|
+        version.should be_an_instance_of(Paperlex::Version)
+        version.version.should be_present
+        version.event.should be_present
+      end
+    end
+  end
+
+  describe "#at_version" do
+    before do
+      @contract = create_contract
+    end
+
+    it "should return the given version of the contract" do
+      @version_index = 1
+      FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/versions/#{@version_index}.json?token=", :body => %{{"responses":null,"created_at":"2011-10-04T07:09:01Z","current_version":false,"body":"This Non-Disclosure Agreement (the **Agreement**) is made as of **{{effective_date}}** (the **Effective Date**) by and between **{{party_a}}**, reachable at **{{party_a_address}}**; and **{{party_b}}**","uuid":"ce883764523af12e","updated_at":"2011-10-04T07:09:01Z","subject":"NDA","number_of_signers":2,"number_of_identity_verifications":1}}
+      contract_version = @contract.version_at(@version_index)
+      contract_version.current_version.should be_false
+      contract_version.body.should be_present
+      contract_version.subject.should be_present
+      contract_version.number_of_signers.should be_present
+      contract_version.created_at.should be_present
+    end
+  end
+
+  describe "#revert_to_version" do
+    before do
+      @contract = create_contract
+    end
+
+    it "should return the given version of the contract" do
+      @version_index = 1
+      FakeWeb.register_uri :post, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/versions/#{@version_index}/revert.json", :body => %{{"responses":null,"created_at":"2011-10-04T07:09:01Z","current_version":false,"body":"This Non-Disclosure Agreement (the **Agreement**) is made as of **{{effective_date}}** (the **Effective Date**) by and between **{{party_a}}**, reachable at **{{party_a_address}}**; and **{{party_b}}**","uuid":"ce883764523af12e","updated_at":"2011-10-04T07:09:01Z","subject":"NDA","number_of_signers":2,"number_of_identity_verifications":1}}
+      contract_version = @contract.revert_to_version(@version_index)
+      contract_version.current_version.should be_false
+      contract_version.body.should be_present
+      contract_version.subject.should be_present
+      contract_version.number_of_signers.should be_present
+      contract_version.created_at.should be_present
+    end
+  end
 end

@@ -20,6 +20,12 @@ module Paperlex
   autoload :Slaw
   autoload :ReviewSession
   autoload :Signer
+  autoload :Versions
+
+  class Version < Hashie::Dash
+    property :version, :required => true
+    property :event, :required => true
+  end
 
   SANDBOX_URL = 'https://sandbox.api.paperlex.com/v1'
   LIVE_URL = 'https://api.paperlex.com/v1'

@@ -37,7 +37,7 @@ module Paperlex
 
     # Versions
     def versions
-      Paperlex::Slaw::Versions[uuid].all
+      Paperlex::Slaw::Versions[uuid].all.map {|version| Version.new(version) }
     end
 
     def at_version(version_index)

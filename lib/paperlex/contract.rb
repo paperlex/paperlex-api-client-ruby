@@ -6,6 +6,7 @@ module Paperlex
     autoload :Signers
     autoload :Responses
     autoload :ReviewSessions
+    autoload :Versions
 
     # Provided by index
     property :created_at
@@ -131,15 +132,16 @@ module Paperlex
 
     # Versions
     def versions
-      Versions[uuid].all
+      Versions[uuid].all.map {|version| Version.new(version) }
     end
 
     def at_version(version_index)
-      new(Versions[uuid].find(version_index))
+      self.class.new(Versions[uuid].find(version_index))
     end
+    alias_method :version_at, :at_version
 
     def revert_to_version(version_index)
-      new(Versions[uuid].revert_to(version_index))
+      self.class.new(Versions[uuid].revert_to(version_index))
     end
 
     # Responses
