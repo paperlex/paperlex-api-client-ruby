@@ -2,6 +2,9 @@ module Paperlex
   class Slaw < Base
     include RootObject
 
+    extend ActiveSupport::Autoload
+    autoload :Versions
+
     property :public
     property :name
     property :description
@@ -41,11 +44,12 @@ module Paperlex
     end
 
     def at_version(version_index)
-      new(Paperlex::Slaw::Versions[uuid].find(version_index))
+      self.class.new(Paperlex::Slaw::Versions[uuid].find(version_index))
     end
+    alias_method :version_at, :at_version
 
     def revert_to_version(version_index)
-      new(Paperlex::Slaw::Versions[uuid].revert_to(version_index))
+      self.class.new(Paperlex::Slaw::Versions[uuid].revert_to(version_index))
     end
   end
 end
