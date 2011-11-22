@@ -145,11 +145,15 @@ module Paperlex
     end
 
     # Responses
-    def update_responses
+    def responses
+      self[:responses] ||= {}
+    end
+
+    def fetch_responses
       self.responses = Responses[uuid].all
     end
 
-    def update_response(key)
+    def fetch_response(key)
       self.responses[key] = Responses[uuid].find(key)
     end
 
@@ -164,6 +168,7 @@ module Paperlex
     def delete_response(key)
       Responses[uuid].destroy(key)
       self.responses.delete(key)
+      responses
     end
 
     private

@@ -1,6 +1,6 @@
 module Paperlex
   class Contract < Base
-    class Responses
+    class Responses < Base
       attr_reader :contract_uuid
 
       class << self
@@ -14,23 +14,23 @@ module Paperlex
       end
 
       def all
-        get(collection_url)
+        self.class.get(collection_url)
       end
 
       def update_all(responses)
-        post(collection_url, {:responses => responses})
+        self.class.post(collection_url, {:responses => responses})
       end
 
       def find(key)
-        get(url_for(key)).first
+        self.class.get(url_for(key)).first
       end
 
       def update(key, value)
-        put(url_for(key), {:value => value})
+        self.class.put(url_for(key), {:value => value})
       end
 
       def destroy(key)
-        delete(url_for(key))
+        self.class.delete(url_for(key))
       end
 
       private

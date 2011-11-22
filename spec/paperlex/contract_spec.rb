@@ -479,4 +479,74 @@ describe Paperlex::Contract do
       contract_version.created_at.should be_present
     end
   end
+
+  describe "#fetch_responses" do
+    before do
+      @contract = create_contract
+    end
+
+    it "should return the responses hash" do
+      @contract.responses.should be_empty
+      FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/responses.json?token=", :body => %{{"party_b":"Jane Smith","confidential_duration":"1 year","party_a":"John Smith"}}
+      expected_results = {'party_b' => 'Jane Smith', 'confidential_duration' => '1 year', 'party_a' => 'John Smith'}
+      responses = @contract.fetch_responses
+      @contract.responses.should == expected_results
+      responses.should == expected_results
+    end
+  end
+
+  describe "#fetch_response" do
+    before do
+      @contract = create_contract
+    end
+
+    it "should return a response value" do
+      @contract.responses.should be_empty
+      @key = 'party_a'
+      FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/responses/#{@key}.json?token=", :body => %{["John Smith"]}
+      response = @contract.fetch_response(@key)
+      response.should == 'John Smith'
+      @contract.responses[@key].should == 'John Smith'
+    end
+  end
+
+  describe "#save_responses" do
+    before do
+      @contract = create_contract
+    end
+
+    it "should post to paperlex" do
+      FakeWeb.register_uri :post, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/responses.json", :body => "{}"
+      @contract.save_responses
+    end
+  end
+
+  describe "#save_response" do
+    before do
+      @contract = create_contract
+      @key = 'party_a'
+    end
+
+    it "should put to paperlex" do
+      FakeWeb.register_uri :put, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/responses/#{@key}.json", :body => "{}"
+      @contract.save_response(@key)
+    end
+  end
+
+  describe "#delete_response" do
+    before do
+      @contract = create_contract
+      @key = 'party_a'
+      FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/responses.json?token=", :body => %{{"party_b":"Jane Smith","confidential_duration":"1 year","party_a":"John Smith"}}
+      @contract.fetch_responses
+    end
+
+    it "should delete the response" do
+      @key = 'party_a'
+      @contract.responses.keys.should include(@key)
+      FakeWeb.register_uri :delete, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/responses/#{@key}.json", :body => %{["John Smith"]}
+      @contract.delete_response(@key)
+      @contract.responses.keys.should_not include(@key)
+    end
+  end
 end
