@@ -167,7 +167,11 @@ describe Paperlex::Contract do
       @contract = create_contract
       @signer_emails = [Faker::Internet.email, Faker::Internet.email]
 
-      unless Paperlex.token
+      if Paperlex.token
+        @signer_emails.each do |email|
+          Paperlex::Contract::Signers[@contract.uuid].create(:email => email)
+        end
+      else
         FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/signers.json?token=", {:body => "[#{@signer_emails.map {|signer_email|  "{\"uuid\":\"#{SecureRandom.hex(16)}\",\"email\":\"#{signer_email}\"}"}.join(", ")}]" }
       end
     end
