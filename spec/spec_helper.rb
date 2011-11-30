@@ -14,6 +14,10 @@ else
   FakeWeb.allow_net_connect = false
 end
 
+if ENV['PAPERLEX_URL']
+  Paperlex.base_url = ENV['PAPERLEX_URL']
+end
+
 RSpec.configure do |config|
   # == Mock Framework
   #
