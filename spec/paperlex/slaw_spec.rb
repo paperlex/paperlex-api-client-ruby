@@ -1,10 +1,6 @@
 require 'spec_helper'
 
 describe Paperlex::Slaw do
-  def be_boolean
-    satisfy {|v| [true, false].include?(v) }
-  end
-
   before do
     @body = Faker::Lorem.paragraphs.join("\n\n")
     @name = Faker::Company.catch_phrase
@@ -85,7 +81,7 @@ describe Paperlex::Slaw do
       @slaw.body = 'Foo'
       @slaw.name = 'Bar'
       @slaw.description = 'Baz'
-      Paperlex::Base.should_receive(:put).with(Paperlex::Slaw.url_for(@slaw.uuid), {:body => 'Foo', :name => 'Bar', :description => 'Baz'})
+      Paperlex::Base.should_receive(:put).with(Paperlex::Slaw.url_for(@slaw.uuid), :slaw => {:body => 'Foo', :name => 'Bar', :description => 'Baz'})
       @slaw.save!
       @slaw.body.should == 'Foo'
       @slaw.name.should == 'Bar'
@@ -110,6 +106,8 @@ describe Paperlex::Slaw do
   describe "#versions" do
     before do
       @slaw = create_slaw
+      @slaw.body = "Foo"
+      @slaw.save!
     end
 
     it "should return details of the various versions of the slaw" do
@@ -131,16 +129,23 @@ describe Paperlex::Slaw do
       @slaw = create_slaw
     end
 
-    it "should return the given version of the slaw" do
-      @version_index = 1
-      unless Paperlex.token
-        FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws/#{@slaw.uuid}/versions/#{@version_index}.json?token=", :body => %{{"name":"Non-Disclosure Agreement","public":true,"body":"This Non-Disclosure Agreement","uuid":"23a15b9e18d09168","description":"Non-Disclosure Agreement"}}
+    context "when the version exists" do
+      before do
+        @slaw.body = "Foo"
+        @slaw.save!
       end
-      slaw_version = @slaw.version_at(@version_index)
-      slaw_version.public.should be_present
-      slaw_version.description.should be_present
-      slaw_version.name.should be_present
-      slaw_version.uuid.should be_present
+
+      it "should return the given version of the slaw" do
+        @version_index = 1
+        unless Paperlex.token
+          FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws/#{@slaw.uuid}/versions/#{@version_index}.json?token=", :body => %{{"name":"Non-Disclosure Agreement","public":true,"body":"This Non-Disclosure Agreement","uuid":"23a15b9e18d09168","description":"Non-Disclosure Agreement"}}
+        end
+        slaw_version = @slaw.version_at(@version_index)
+        slaw_version.public.should be_boolean
+        slaw_version.description.should be_present
+        slaw_version.name.should be_present
+        slaw_version.uuid.should be_present
+      end
     end
   end
 
@@ -149,16 +154,23 @@ describe Paperlex::Slaw do
       @slaw = create_slaw
     end
 
-    it "should return the given version of the slaw" do
-      @version_index = 1
-      unless Paperlex.token
-        FakeWeb.register_uri :post, "#{Paperlex.base_url}/slaws/#{@slaw.uuid}/versions/#{@version_index}/revert.json", :body => %{{"name":"Non-Disclosure Agreement","public":true,"body":"This Non-Disclosure Agreement","uuid":"23a15b9e18d09168","description":"Non-Disclosure Agreement"}}
+    context "when the version exists" do
+      before do
+        @slaw.body = "Foo"
+        @slaw.save!
       end
-      slaw_version = @slaw.revert_to_version(@version_index)
-      slaw_version.public.should be_present
-      slaw_version.description.should be_present
-      slaw_version.name.should be_present
-      slaw_version.uuid.should be_present
+
+      it "should return the given version of the slaw" do
+        @version_index = 1
+        unless Paperlex.token
+          FakeWeb.register_uri :post, "#{Paperlex.base_url}/slaws/#{@slaw.uuid}/versions/#{@version_index}/revert.json", :body => %{{"name":"Non-Disclosure Agreement","public":true,"body":"This Non-Disclosure Agreement","uuid":"23a15b9e18d09168","description":"Non-Disclosure Agreement"}}
+        end
+        slaw_version = @slaw.revert_to_version(@version_index)
+        slaw_version.public.should be_boolean
+        slaw_version.description.should be_present
+        slaw_version.name.should be_present
+        slaw_version.uuid.should be_present
+      end
     end
   end
 end

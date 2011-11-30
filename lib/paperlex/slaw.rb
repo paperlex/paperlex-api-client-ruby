@@ -52,5 +52,11 @@ module Paperlex
     def revert_to_version(version_index)
       self.class.new(Paperlex::Slaw::Versions[uuid].revert_to(version_index))
     end
+
+    private
+
+    def short_name
+      :slaw
+    end
   end
 end

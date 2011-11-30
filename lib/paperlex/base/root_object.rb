@@ -26,7 +26,7 @@ module Paperlex
 
     def save!(fields = nil)
       fields ||= self.class.update_fields
-      self.class.put(self.class.url_for(uuid), Hash[fields.map {|field| [field, self[field]]}])
+      self.class.put(self.class.url_for(uuid), short_name => Hash[fields.map {|field| [field, self[field]]}])
       self
     end
   end

@@ -173,6 +173,10 @@ module Paperlex
 
     private
 
+    def short_name
+      :contract
+    end
+
     def remove_signer!(signer_to_remove)
       signer_uuid = to_uuid(signer_to_remove)
       signers.delete_if {|signer| signer['uuid'] == signer_uuid }
