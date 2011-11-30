@@ -2,3 +2,36 @@
 
 Read more at https://sandbox.api.paperlex.com.
 
+    require 'rubygems'
+    require 'paperlex'
+    
+    Paperlex.token = "b53b0c15dce176b4"
+    
+    templates =  Paperlex::Slaw.all
+    
+    nda_template = templates.first
+    
+    contract = Paperlex::Contract.create({
+      :slaw_id => nda_template.uuid,
+      :subject => "My First NDA",
+      :number_of_signers => 2,
+      :responses => {
+        :party_a => "John Smith",
+        :party_b => "Jane Smith",
+        :party_a_address => "john_smith@example.com",
+        :party_b_address => "jane_smith@example.com",
+        :confidential_duration => "1 year"
+      }
+    })
+    
+    contract.responses[:confidential_duration] = "2 years"
+    contract.responses[:state] = "New York"
+    
+    contract.save_responses
+    
+    contract.create_signer(:email => "john_smith@example.com")
+    contract.create_signer(:email => "jane_smith@example.com")
+    
+    review_session = contract.create_review_session(:email => "john_smith@example.com", :expires_in => 172800)
+    
+    puts "URL: #{review_session.url}"
