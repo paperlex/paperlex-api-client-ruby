@@ -31,7 +31,7 @@ module Paperlex
       end
 
       def create_fields
-        [*update_fields, :slaw_id]
+        [*update_fields] << :slaw_id
       end
 
       def url_name

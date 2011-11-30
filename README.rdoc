@@ -1,3 +1,4 @@
 = Paperlex
 
-Documentation coming soon.
+Read more at https://sandbox.api.paperlex.com.
+
