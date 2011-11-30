@@ -5,10 +5,10 @@ require "paperlex/version"
 
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
-  s.name        = "paperlex_api_client"
+  s.name        = "paperlex"
   s.version     = Paperlex::VERSION
-  s.authors     = ["Ben Woosley"]
-  s.email       = ["ben@paperlex.com"]
+  s.authors     = ["Paperlex"]
+  s.email       = ["api-help@paperlex.com"]
   s.homepage    = "https://api.paperlex.com/"
   s.summary     = "A Paperlex API client in Ruby"
   s.description = "Dead-simple Legal Documents"
