@@ -9,6 +9,7 @@ module Paperlex
     property :name
     property :description
     property :body
+    property :response_keys
 
     class << self
       def url_name

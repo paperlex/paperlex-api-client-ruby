@@ -1,6 +1,10 @@
 require 'spec_helper'
 
 describe Paperlex::Slaw do
+  def be_boolean
+    satisfy {|v| [true, false].include?(v) }
+  end
+
   before do
     @body = Faker::Lorem.paragraphs.join("\n\n")
     @name = Faker::Company.catch_phrase
@@ -24,10 +28,10 @@ describe Paperlex::Slaw do
 
     it "should fetch all existing slaws" do
       @slaws = Paperlex::Slaw.all
-      @slaws.size.should == 1
+      @slaws.size.should be > 0
       @slaws.each do |slaw|
         slaw.name.should be_present
-        slaw.public.should be_present
+        slaw.public.should be_boolean
         slaw.uuid.should be_present
         slaw.description.should be_present
       end
@@ -46,19 +50,26 @@ describe Paperlex::Slaw do
 
   describe ".find" do
     before do
-      unless Paperlex.token
+      @name = "Non-Disclosure Agreement"
+      @description = "Non-Disclosure Agreement Description"
+      @body = "This Non-Disclosure Agreement (the **Agreement**) is made as of **{{effective_date}}** (the **Effective Date**) by and between **{{party_a}}**, reachable at **{{party_a_address}}**; and **{{party_b}}**"
+      if Paperlex.token
+        slaw = Paperlex::Slaw.create(:name => @name, :description => @description, :body => @body)
+        @uuid = slaw.uuid
+      else
         @uuid = '23a15b9e18d09168'
-        FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws/#{@uuid}.json?token=", :body => %{{"name":"Non-Disclosure Agreement","public":true,"body":"This Non-Disclosure Agreement (the **Agreement**) is made as of **{{effective_date}}** (the **Effective Date**) by and between **{{party_a}}**, reachable at **{{party_a_address}}**; and **{{party_b}}**","uuid":"#{@uuid}","description":"Non-Disclosure Agreement"}}
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws/#{@uuid}.json?token=", :body => %{{"name":"#{@name}","public":true,"body":"#{@body}","uuid":"#{@uuid}","description":"#{@description}"}}
       end
     end
 
     it "should create a slaw with just a uuid" do
       slaw = Paperlex::Slaw.find(@uuid)
+      slaw.response_keys.should =~ %w[party_a party_b effective_date party_a_address]
       slaw.uuid.should == @uuid
-      slaw.body.should be_present
-      slaw.description.should be_present
-      slaw.name.should be_present
-      slaw.public.should be_present
+      slaw.body.should == @body
+      slaw.description.should == @description
+      slaw.name.should == @name
+      slaw.public.should be_boolean
     end
   end
 
@@ -100,7 +111,7 @@ describe Paperlex::Slaw do
     it "should return details of the various versions of the slaw" do
       FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws/#{@slaw.uuid}/versions.json?token=", :body => %{[{"version":1,"event":"update"},{"version":2,"event":"update"},{"version":3,"event":"update"}]}
       versions = @slaw.versions
-      versions.size.should == 3
+      versions.size.should be > 0
       versions.each do |version|
         version.should be_an_instance_of(Paperlex::Version)
         version.version.should be_present
