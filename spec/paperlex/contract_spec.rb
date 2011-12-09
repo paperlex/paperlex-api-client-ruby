@@ -124,7 +124,7 @@ describe Paperlex::Contract do
     end
 
     it "should return the html url" do
-      Paperlex::Contract.new(@uuid).html_url.should == "https://sandbox.api.paperlex.com/v1/contracts/#{@uuid}.html?token=#{Paperlex.token}"
+      Paperlex::Contract.new(@uuid).html_url.should == "#{Paperlex.base_url}/contracts/#{@uuid}.html?token=#{Paperlex.token}"
     end
   end
 
@@ -300,7 +300,7 @@ describe Paperlex::Contract do
       @contract = create_contract
       @email = Faker::Internet.email
       unless Paperlex.token
-        FakeWeb.register_uri :post, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions.json", :body => %{{"expires_at":"2011-10-05T07:10:03Z","uuid":"d9df3765905e7695","token":"71fcd58ed9735cad","url":"https://sandbox.api.paperlex.com/v1/contracts/ce883764523af12e/review?token=71fcd58ed9735cad","email":"#{@email}"}}
+        FakeWeb.register_uri :post, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions.json", :body => %{{"expires_at":"2011-10-05T07:10:03Z","uuid":"d9df3765905e7695","token":"71fcd58ed9735cad","url":"#{Paperlex.base_url}/contracts/ce883764523af12e/review?token=71fcd58ed9735cad","email":"#{@email}"}}
       end
     end
 
@@ -317,7 +317,7 @@ describe Paperlex::Contract do
       @review_session_emails = [Faker::Internet.email, Faker::Internet.email]
 
       unless Paperlex.token
-        FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions.json?token=", {:body => "[#{@review_session_emails.map {|review_session_email|  %{{"expires_at":"2011-10-05T07:10:03Z","uuid":"#{SecureRandom.hex(16)}","token":"#{SecureRandom.hex(16)}","url":"https://sandbox.api.paperlex.com/v1/contracts/#{@contract.uuid}/review?token=#{SecureRandom.hex(16)}","email":"#{review_session_email}\"}}}.join(", ")}]" }
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions.json?token=", {:body => "[#{@review_session_emails.map {|review_session_email|  %{{"expires_at":"2011-10-05T07:10:03Z","uuid":"#{SecureRandom.hex(16)}","token":"#{SecureRandom.hex(16)}","url":"#{Paperlex.base_url}/contracts/#{@contract.uuid}/review?token=#{SecureRandom.hex(16)}","email":"#{review_session_email}\"}}}.join(", ")}]" }
       end
     end
 
@@ -349,7 +349,7 @@ describe Paperlex::Contract do
         @new_email = Faker::Internet.email
         @review_session.email.should_not == @new_email
         unless Paperlex.token
-          FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions/#{@review_session.uuid}.json?token=", {:body => %{{"expires_at":"2011-10-05T07:10:03Z","uuid":"#{@review_session.uuid}","token":"#{@review_session.token}","url":"https://sandbox.api.paperlex.com/v1/contracts/ce883764523af12e/review?token=71fcd58ed9735cad","email":"#{@new_email}"}} }
+          FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions/#{@review_session.uuid}.json?token=", {:body => %{{"expires_at":"2011-10-05T07:10:03Z","uuid":"#{@review_session.uuid}","token":"#{@review_session.token}","url":"#{Paperlex.base_url}/contracts/ce883764523af12e/review?token=71fcd58ed9735cad","email":"#{@new_email}"}} }
         end
         @new_review_session = @contract.fetch_review_session(@identifier)
         @new_review_session.email.should == @new_email
@@ -386,7 +386,7 @@ describe Paperlex::Contract do
         @new_email = Faker::Internet.email
         @review_session.email.should_not == @new_email
         unless Paperlex.token
-          FakeWeb.register_uri :put, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions/#{@review_session.uuid}.json", {:body => %{{"expires_at":"2011-10-05T07:10:03Z","uuid":"#{@review_session.uuid}","token":"#{@review_session.token}","url":"https://sandbox.api.paperlex.com/v1/contracts/ce883764523af12e/review?token=71fcd58ed9735cad","email":"#{@new_email}"}} }
+          FakeWeb.register_uri :put, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions/#{@review_session.uuid}.json", {:body => %{{"expires_at":"2011-10-05T07:10:03Z","uuid":"#{@review_session.uuid}","token":"#{@review_session.token}","url":"#{Paperlex.base_url}/contracts/ce883764523af12e/review?token=71fcd58ed9735cad","email":"#{@new_email}"}} }
         end
         @new_review_session = @contract.update_review_session(@identifier, {:email => @new_email})
         @new_review_session.email.should == @new_email
@@ -422,7 +422,7 @@ describe Paperlex::Contract do
       it "should delete the review_session" do
         @review_session = @contract.review_sessions.first
         unless Paperlex.token
-          FakeWeb.register_uri :delete, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions/#{@review_session.uuid}.json", {:body => %{{"expires_at":"2011-10-05T07:10:03Z","uuid":"#{@review_session.uuid}","token":"#{@review_session.token}","url":"https://sandbox.api.paperlex.com/v1/contracts/ce883764523af12e/review?token=71fcd58ed9735cad","email":"#{@review_session.email}"}} }
+          FakeWeb.register_uri :delete, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions/#{@review_session.uuid}.json", {:body => %{{"expires_at":"2011-10-05T07:10:03Z","uuid":"#{@review_session.uuid}","token":"#{@review_session.token}","url":"#{Paperlex.base_url}/contracts/ce883764523af12e/review?token=71fcd58ed9735cad","email":"#{@review_session.email}"}} }
         end
         @contract.delete_review_session(@identifier)
         @contract.review_sessions.should_not include(@review_session)
