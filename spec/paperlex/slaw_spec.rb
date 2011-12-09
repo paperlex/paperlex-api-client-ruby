@@ -18,7 +18,7 @@ describe Paperlex::Slaw do
   describe ".all" do
     before do
       unless Paperlex.token
-        FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws.json?token=", :body => %{[{"name":"Non-Disclosure Agreement","public":true,"uuid":"23a15b9e18d09168","description":"Non-Disclosure Agreement"}]}
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws.json", :body => %{[{"name":"Non-Disclosure Agreement","public":true,"uuid":"23a15b9e18d09168","description":"Non-Disclosure Agreement"}]}
       end
     end
 
@@ -55,7 +55,7 @@ describe Paperlex::Slaw do
         @uuid = slaw.uuid
       else
         @uuid = '23a15b9e18d09168'
-        FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws/#{@uuid}.json?token=", :body => %{{"name":"#{@name}","public":true,"body":"#{@body}","uuid":"#{@uuid}","description":"#{@description}","response_keys":#{@response_keys.to_json}}}
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws/#{@uuid}.json", :body => %{{"name":"#{@name}","public":true,"body":"#{@body}","uuid":"#{@uuid}","description":"#{@description}","response_keys":#{@response_keys.to_json}}}
       end
     end
 
@@ -113,7 +113,7 @@ describe Paperlex::Slaw do
 
     it "should return details of the various versions of the slaw" do
       unless Paperlex.token
-        FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws/#{@slaw.uuid}/versions.json?token=", :body => %{[{"version":1,"event":"update"},{"version":2,"event":"update"},{"version":3,"event":"update"}]}
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws/#{@slaw.uuid}/versions.json", :body => %{[{"version":1,"event":"update"},{"version":2,"event":"update"},{"version":3,"event":"update"}]}
       end
       versions = @slaw.versions
       versions.size.should be > 0
@@ -139,7 +139,7 @@ describe Paperlex::Slaw do
       it "should return the given version of the slaw" do
         @version_index = 1
         unless Paperlex.token
-          FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws/#{@slaw.uuid}/versions/#{@version_index}.json?token=", :body => %{{"name":"Non-Disclosure Agreement","public":true,"body":"This Non-Disclosure Agreement","uuid":"23a15b9e18d09168","description":"Non-Disclosure Agreement"}}
+          FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws/#{@slaw.uuid}/versions/#{@version_index}.json", :body => %{{"name":"Non-Disclosure Agreement","public":true,"body":"This Non-Disclosure Agreement","uuid":"23a15b9e18d09168","description":"Non-Disclosure Agreement"}}
         end
         slaw_version = @slaw.version_at(@version_index)
         slaw_version.public.should be_boolean
