@@ -197,7 +197,9 @@ describe Paperlex::Contract do
       it "should fetch the new signer data" do
         @new_email = Faker::Internet.email
         @signer.email.should_not == @new_email
-        unless Paperlex.token
+        if Paperlex.token
+          Paperlex::Contract::Signers[@contract.uuid].update(@signer.uuid, :email => @new_email)
+        else
           FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/signers/#{@signer.uuid}.json", {:body => "{\"uuid\":\"#{@signer.uuid}\",\"email\":\"#{@new_email}\"}" }
         end
         @new_signer = @contract.fetch_signer(@identifier)
@@ -315,14 +317,17 @@ describe Paperlex::Contract do
     before do
       @contract = create_contract
       @review_session_emails = [Faker::Internet.email, Faker::Internet.email]
-
-      unless Paperlex.token
-        FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions.json", {:body => "[#{@review_session_emails.map {|review_session_email|  %{{"expires_at":"2011-10-05T07:10:03Z","uuid":"#{SecureRandom.hex(16)}","token":"#{SecureRandom.hex(16)}","url":"#{Paperlex.base_url}/contracts/#{@contract.uuid}/review?token=#{SecureRandom.hex(16)}","email":"#{review_session_email}\"}}}.join(", ")}]" }
-      end
     end
 
     it "should update the review_sessions" do
-      @contract.review_sessions.should be_empty
+      @contract.review_sessions.should == []
+      if Paperlex.token
+        @review_session_emails.each do |email|
+          @contract.create_review_session(:email => email)
+        end
+      else
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions.json", {:body => "[#{@review_session_emails.map {|review_session_email|  %{{"expires_at":"2011-10-05T07:10:03Z","uuid":"#{SecureRandom.hex(16)}","token":"#{SecureRandom.hex(16)}","url":"#{Paperlex.base_url}/contracts/#{@contract.uuid}/review?token=#{SecureRandom.hex(16)}","email":"#{review_session_email}\"}}}.join(", ")}]" }
+      end
       @review_sessions = @contract.fetch_review_sessions
       @contract.review_sessions.should == @review_sessions
       @review_sessions.should be_present
@@ -348,7 +353,9 @@ describe Paperlex::Contract do
       it "should fetch the new review_session data" do
         @new_email = Faker::Internet.email
         @review_session.email.should_not == @new_email
-        unless Paperlex.token
+        if Paperlex.token
+          Paperlex::Contract::ReviewSessions[@contract.uuid].update(@review_session.uuid, :email => @new_email)
+        else
           FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/review_sessions/#{@review_session.uuid}.json", {:body => %{{"expires_at":"2011-10-05T07:10:03Z","uuid":"#{@review_session.uuid}","token":"#{@review_session.token}","url":"#{Paperlex.base_url}/contracts/ce883764523af12e/review?token=71fcd58ed9735cad","email":"#{@new_email}"}} }
         end
         @new_review_session = @contract.fetch_review_session(@identifier)
@@ -453,7 +460,12 @@ describe Paperlex::Contract do
     end
 
     it "should return details of the various versions of the contract" do
-      unless Paperlex.token
+      if Paperlex.token
+        3.times do |time|
+          @contract.body = time.to_s
+          @contract.save!
+        end
+      else
         FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/versions.json", :body => %{[{"version":1,"event":"update"},{"version":2,"event":"update"},{"version":3,"event":"update"}]}
       end
       versions = @contract.versions
@@ -473,7 +485,10 @@ describe Paperlex::Contract do
 
     it "should return the given version of the contract" do
       @version_index = 1
-      unless Paperlex.token
+      if Paperlex.token
+        @contract.body = "Bar"
+        @contract.save!
+      else
         FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/versions/#{@version_index}.json", :body => %{{"responses":null,"created_at":"2011-10-04T07:09:01Z","current_version":false,"body":"This Non-Disclosure Agreement (the **Agreement**) is made as of **{{effective_date}}** (the **Effective Date**) by and between **{{party_a}}**, reachable at **{{party_a_address}}**; and **{{party_b}}**","uuid":"ce883764523af12e","updated_at":"2011-10-04T07:09:01Z","subject":"NDA","number_of_signers":2,"number_of_identity_verifications":1}}
       end
       contract_version = @contract.version_at(@version_index)
@@ -492,7 +507,10 @@ describe Paperlex::Contract do
 
     it "should return the given version of the contract" do
       @version_index = 1
-      unless Paperlex.token
+      if Paperlex.token
+        @contract.body = "Bar"
+        @contract.save!
+      else
         FakeWeb.register_uri :post, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/versions/#{@version_index}/revert.json", :body => %{{"responses":null,"created_at":"2011-10-04T07:09:01Z","current_version":false,"body":"This Non-Disclosure Agreement (the **Agreement**) is made as of **{{effective_date}}** (the **Effective Date**) by and between **{{party_a}}**, reachable at **{{party_a_address}}**; and **{{party_b}}**","uuid":"ce883764523af12e","updated_at":"2011-10-04T07:09:01Z","subject":"NDA","number_of_signers":2,"number_of_identity_verifications":1}}
       end
       contract_version = @contract.revert_to_version(@version_index)
@@ -510,11 +528,14 @@ describe Paperlex::Contract do
     end
 
     it "should return the responses hash" do
+      expected_results = {'party_b' => 'Jane Smith', 'confidential_duration' => '1 year', 'party_a' => 'John Smith'}
       @contract.responses.should be_empty
-      unless Paperlex.token
+      if Paperlex.token
+        @contract.responses = expected_results
+        @contract.save_responses
+      else
         FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/responses.json", :body => %{{"party_b":"Jane Smith","confidential_duration":"1 year","party_a":"John Smith"}}
       end
-      expected_results = {'party_b' => 'Jane Smith', 'confidential_duration' => '1 year', 'party_a' => 'John Smith'}
       responses = @contract.fetch_responses
       @contract.responses.should == expected_results
       responses.should == expected_results
@@ -527,14 +548,18 @@ describe Paperlex::Contract do
     end
 
     it "should return a response value" do
+      expected_result = "John Smith"
       @contract.responses.should be_empty
       @key = 'party_a'
-      unless Paperlex.token
-        FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/responses/#{@key}.json", :body => %{["John Smith"]}
+      if Paperlex.token
+        @contract.responses[@key] = expected_result
+        @contract.save_responses
+      else
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/responses/#{@key}.json", :body => %{["#{expected_result}"]}
       end
       response = @contract.fetch_response(@key)
-      response.should == 'John Smith'
-      @contract.responses[@key].should == 'John Smith'
+      response.should == expected_result
+      @contract.responses[@key].should == expected_result
     end
   end
 
@@ -547,6 +572,7 @@ describe Paperlex::Contract do
       unless Paperlex.token
         FakeWeb.register_uri :post, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/responses.json", :body => "{}"
       end
+      @contract.responses = {'foo' => 'bar'}
       @contract.save_responses
     end
   end
@@ -569,7 +595,10 @@ describe Paperlex::Contract do
     before do
       @contract = create_contract
       @key = 'party_a'
-      unless Paperlex.token
+      if Paperlex.token
+        @contract.responses[@key] = "John Smith"
+        @contract.save_responses
+      else
         FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/responses.json", :body => %{{"party_b":"Jane Smith","confidential_duration":"1 year","party_a":"John Smith"}}
       end
       @contract.fetch_responses
