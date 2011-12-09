@@ -49,18 +49,19 @@ describe Paperlex::Slaw do
       @name = "Non-Disclosure Agreement"
       @description = "Non-Disclosure Agreement Description"
       @body = "This Non-Disclosure Agreement (the **Agreement**) is made as of **{{effective_date}}** (the **Effective Date**) by and between **{{party_a}}**, reachable at **{{party_a_address}}**; and **{{party_b}}**"
+      @response_keys = %w[party_a party_b effective_date party_a_address]
       if Paperlex.token
         slaw = Paperlex::Slaw.create(:name => @name, :description => @description, :body => @body)
         @uuid = slaw.uuid
       else
         @uuid = '23a15b9e18d09168'
-        FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws/#{@uuid}.json?token=", :body => %{{"name":"#{@name}","public":true,"body":"#{@body}","uuid":"#{@uuid}","description":"#{@description}"}}
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws/#{@uuid}.json?token=", :body => %{{"name":"#{@name}","public":true,"body":"#{@body}","uuid":"#{@uuid}","description":"#{@description}","response_keys":#{@response_keys.to_json}}}
       end
     end
 
     it "should create a slaw with just a uuid" do
       slaw = Paperlex::Slaw.find(@uuid)
-      slaw.response_keys.should =~ %w[party_a party_b effective_date party_a_address]
+      slaw.response_keys.should =~ @response_keys
       slaw.uuid.should == @uuid
       slaw.body.should == @body
       slaw.description.should == @description

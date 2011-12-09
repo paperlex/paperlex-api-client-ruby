@@ -140,7 +140,7 @@ describe Paperlex::Contract do
       @contract.body = 'Foo'
       @contract.subject = 'Bar'
       @contract.number_of_signers = 3
-      Paperlex::Base.should_receive(:put).with(Paperlex::Contract.url_for(@contract.uuid), {:body => 'Foo', :subject => 'Bar', :number_of_signers => 3, :responses => @contract.responses, :signature_callback_url => @contract.signature_callback_url})
+      Paperlex::Base.should_receive(:put).with(Paperlex::Contract.url_for(@contract.uuid), :contract => {:body => 'Foo', :subject => 'Bar', :number_of_signers => 3, :responses => @contract.responses, :signature_callback_url => @contract.signature_callback_url})
       @contract.save!
       @contract.body.should == 'Foo'
       @contract.subject.should == 'Bar'
