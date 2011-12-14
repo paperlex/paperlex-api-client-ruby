@@ -116,6 +116,44 @@ describe Paperlex::Slaw do
     end
   end
 
+  describe "#html_url" do
+    context "without responses" do
+      it "should return the url" do
+        @slaw = create_slaw
+        @slaw.html_url.should == "#{Paperlex.base_url}/slaws/#{@slaw.uuid}.html?token=#{Paperlex.token}"
+      end
+    end
+
+    context "with responses" do
+      it "should return the url" do
+        @slaw = create_slaw
+        @slaw.html_url(:foo => 'bar', :baz => 'bam').should == "#{Paperlex.base_url}/slaws/#{@slaw.uuid}.html?responses%5Bbaz%5D=bam&responses%5Bfoo%5D=bar&token=#{Paperlex.token}"
+      end
+    end
+  end
+
+  describe "#to_html" do
+    context "without responses" do
+      it "should return the url" do
+        @slaw = create_slaw
+        unless Paperlex.token
+          FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws/#{@slaw.uuid}.html?token=", :body => 'foo'
+        end
+        @slaw.to_html.should be_present
+      end
+    end
+
+    context "with responses" do
+      it "should return the url" do
+        @slaw = create_slaw
+        unless Paperlex.token
+          FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws/#{@slaw.uuid}.html?responses%5Bbaz%5D=bam&responses%5Bfoo%5D=bar&token=", :body => 'foo'
+        end
+        @slaw.to_html(:foo => 'bar', :baz => 'bam').should be_present
+      end
+    end
+  end
+
   describe "#versions" do
     before do
       @slaw = create_slaw

@@ -29,10 +29,14 @@ module Paperlex
       end
     end
 
-    def html_url(responses)
+    def html_url(responses = nil)
       params = {:token => Paperlex.token}
       params[:responses] = responses if responses.present?
       "#{Paperlex.base_url}/slaws/#{uuid}.html?#{params.to_query}"
+    end
+
+    def to_html(responses = nil)
+      RestClient.get(html_url(responses))
     end
 
     def destroy

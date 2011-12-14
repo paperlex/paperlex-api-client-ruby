@@ -56,6 +56,10 @@ module Paperlex
       "#{Paperlex.base_url}/contracts/#{uuid}.html?#{{:token => Paperlex.token}.to_query}"
     end
 
+    def to_html
+      RestClient.get(html_url)
+    end
+
     # Signers
     def signers=(signers)
       self[:signers] = signers.map {|signer| signer.is_a?(Paperlex::Signer) ? signer : Paperlex::Signer.new(signer.merge(:contract_uuid => uuid)) }

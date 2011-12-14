@@ -132,11 +132,24 @@ describe Paperlex::Contract do
 
   describe "#html_url" do
     before do
-      @uuid = SecureRandom.hex(16)
+      @contract = create_contract
     end
 
     it "should return the html url" do
-      Paperlex::Contract.new(@uuid).html_url.should == "#{Paperlex.base_url}/contracts/#{@uuid}.html?token=#{Paperlex.token}"
+      @contract.html_url.should == "#{Paperlex.base_url}/contracts/#{@contract.uuid}.html?token=#{Paperlex.token}"
+    end
+  end
+
+  describe "#to_html" do
+    before do
+      @contract = create_contract
+    end
+
+    it "should return the url" do
+      unless Paperlex.token
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}.html?token=", :body => 'foo'
+      end
+      @contract.to_html.should be_present
     end
   end
 
