@@ -6,12 +6,6 @@ module Paperlex
       attr_reader :contract_uuid
     end
 
-    module ClassMethods
-      def [](parent_uuid)
-        new(parent_uuid)
-      end
-    end
-
     def initialize(contract_uuid)
       @contract_uuid = contract_uuid
     end

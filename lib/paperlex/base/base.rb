@@ -11,6 +11,10 @@ module Paperlex
         end
       end
 
+      def [](uuid)
+        new(uuid)
+      end
+
       [:get, :post, :put, :delete].each do |method|
         class_eval <<-METHOD, __FILE__, __LINE__ + 1
           def #{method}(url, attrs = {})

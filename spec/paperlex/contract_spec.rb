@@ -104,7 +104,7 @@ describe Paperlex::Contract do
       end
     end
 
-    it "should fetch all existing contracts" do
+    it "should fetch the given contract" do
       @contract = Paperlex::Contract.find(@uuid)
       @contract.created_at.should be_present
       @contract.updated_at.should be_present
@@ -118,9 +118,21 @@ describe Paperlex::Contract do
     end
   end
 
+  describe ".[]" do
+    before do
+      @uuid = SecureRandom.hex(16)
+    end
+
+    it "should return an object with the provided uuid" do
+      contract = Paperlex::Contract[@uuid]
+      contract.should be_an_instance_of(Paperlex::Contract)
+      contract.uuid.should == @uuid
+    end
+  end
+
   describe "#html_url" do
     before do
-      @uuid = "ce883764523af12e"
+      @uuid = SecureRandom.hex(16)
     end
 
     it "should return the html url" do

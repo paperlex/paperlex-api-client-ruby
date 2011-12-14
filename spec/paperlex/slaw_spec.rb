@@ -59,7 +59,7 @@ describe Paperlex::Slaw do
       end
     end
 
-    it "should create a slaw with just a uuid" do
+    it "should fetch the slaw with the given uuid" do
       slaw = Paperlex::Slaw.find(@uuid)
       slaw.response_keys.should =~ @response_keys
       slaw.uuid.should == @uuid
@@ -67,6 +67,18 @@ describe Paperlex::Slaw do
       slaw.description.should == @description
       slaw.name.should == @name
       slaw.public.should be_boolean
+    end
+  end
+
+  describe ".[]" do
+    before do
+      @uuid = SecureRandom.hex(16)
+    end
+
+    it "should return an object with the provided uuid" do
+      contract = Paperlex::Slaw[@uuid]
+      contract.should be_an_instance_of(Paperlex::Slaw)
+      contract.uuid.should == @uuid
     end
   end
 

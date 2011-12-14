@@ -3,12 +3,6 @@ module Paperlex
     class Responses < Base
       attr_reader :contract_uuid
 
-      class << self
-        def [](contract_uuid)
-          new(contract_uuid)
-        end
-      end
-
       def initialize(contract_uuid)
         @contract_uuid = contract_uuid
       end

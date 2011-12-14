@@ -1,15 +1,7 @@
 module Paperlex
   class Versions < Base
-    class << self
-      def [](uuid)
-        new(uuid)
-      end
-    end
-
-    attr_reader :uuid
-
     def initialize(uuid)
-      @uuid = uuid
+      super(:uuid => uuid)
     end
 
     def all
