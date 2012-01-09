@@ -43,7 +43,9 @@ describe Paperlex::Contract do
 
   describe ".all" do
     before do
-      unless Paperlex.token
+      if Paperlex.token
+        Paperlex::Contract.create("body" => Faker::Lorem.paragraphs.join("\n\n"),"subject" => Faker::Company.catch_phrase,"number_of_signers" => 2)
+      else
         FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts.json", :body => %{[{"created_at":"2011-10-04T07:09:01Z","uuid":"ce883764523af12e","updated_at":"2011-10-04T07:09:01Z","subject":"NDA"},{"created_at":"2011-10-04T07:09:01Z","uuid":"0694fb3b248c8973","updated_at":"2011-10-04T07:09:01Z","subject":"Pay me"}]}
       end
     end
