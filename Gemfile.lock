@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    paperlex (0.9.1)
+    paperlex (0.9.3)
       activesupport (>= 3.0.0)
       configatron
       hashie

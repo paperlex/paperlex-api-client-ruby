@@ -117,39 +117,73 @@ describe Paperlex::Slaw do
   end
 
   describe "#html_url" do
+    before do
+      @slaw = create_slaw
+    end
+
     context "without responses" do
       it "should return the url" do
-        @slaw = create_slaw
         @slaw.html_url.should == "#{Paperlex.base_url}/slaws/#{@slaw.uuid}.html?token=#{Paperlex.token}"
+      end
+
+      context "with 'enhanced'" do
+        it "should return the url" do
+          @slaw.html_url({}, :enhanced => true).should == "#{Paperlex.base_url}/slaws/#{@slaw.uuid}.html?enhanced=true&token=#{Paperlex.token}"
+        end
       end
     end
 
     context "with responses" do
       it "should return the url" do
-        @slaw = create_slaw
         @slaw.html_url(:foo => 'bar', :baz => 'bam').should == "#{Paperlex.base_url}/slaws/#{@slaw.uuid}.html?responses%5Bbaz%5D=bam&responses%5Bfoo%5D=bar&token=#{Paperlex.token}"
+      end
+
+      context "with 'enhanced'" do
+        it "should return the url" do
+          @slaw.html_url({:foo => 'bar', :baz => 'bam'}, :enhanced => true).should == "#{Paperlex.base_url}/slaws/#{@slaw.uuid}.html?enhanced=true&responses%5Bbaz%5D=bam&responses%5Bfoo%5D=bar&token=#{Paperlex.token}"
+        end
       end
     end
   end
 
   describe "#to_html" do
+    before do
+      @slaw = create_slaw
+    end
+
     context "without responses" do
       it "should return the url" do
-        @slaw = create_slaw
         unless Paperlex.token
           FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws/#{@slaw.uuid}.html?token=", :body => 'foo'
         end
         @slaw.to_html.should be_present
       end
+
+      context "with 'enhanced'" do
+        it "should return the url" do
+          unless Paperlex.token
+            FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws/#{@slaw.uuid}.html?enhanced=true&token=", :body => 'foo'
+          end
+          @slaw.to_html({}, :enhanced => true).should be_present
+        end
+      end
     end
 
     context "with responses" do
       it "should return the url" do
-        @slaw = create_slaw
         unless Paperlex.token
           FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws/#{@slaw.uuid}.html?responses%5Bbaz%5D=bam&responses%5Bfoo%5D=bar&token=", :body => 'foo'
         end
         @slaw.to_html(:foo => 'bar', :baz => 'bam').should be_present
+      end
+
+      context "with 'enhanced'" do
+        it "should return the url" do
+          unless Paperlex.token
+            FakeWeb.register_uri :get, "#{Paperlex.base_url}/slaws/#{@slaw.uuid}.html?enhanced=true&responses%5Bbaz%5D=bam&responses%5Bfoo%5D=bar&token=", :body => 'foo'
+          end
+          @slaw.to_html({:foo => 'bar', :baz => 'bam'}, :enhanced => true).should be_present
+        end
       end
     end
   end
