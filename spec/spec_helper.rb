@@ -10,6 +10,8 @@ Dir[File.expand_path("../support/**/*.rb", __FILE__)].each {|f| require f }
 
 if ENV['TOKEN']
   Paperlex.token = ENV['TOKEN']
+elsif ENV['CONTRACTABLE_TOKEN']
+  # we'll set Paperlex.token where needed in the specs
 else
   FakeWeb.allow_net_connect = false
 end
