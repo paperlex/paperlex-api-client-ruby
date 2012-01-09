@@ -21,6 +21,7 @@ module Paperlex
   autoload :Slaw
   autoload :ReviewSession
   autoload :Signer
+  autoload :Signature
   autoload :Versions
 
   class Version < Hashie::Dash

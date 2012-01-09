@@ -12,7 +12,7 @@ describe Paperlex::Contract do
   end
 
   def create_contract(args = {})
-    if signer_count = args[:signers]
+    if signer_count = args[:signers] || args[:signatures]
       signer_count = Integer(signer_count)
       args[:signers] = signers = signer_count.times.map do
         Faker::Internet.email
@@ -22,7 +22,23 @@ describe Paperlex::Contract do
         FakeWeb.register_uri :post, "#{Paperlex.base_url}/contracts/#{@contract_uuid}/signers.json", signers.map {|signer_email| {:body => "{\"uuid\":\"#{SecureRandom.hex(16)}\",\"email\":\"#{signer_email}\"}"} }
       end
     end
+    signature_count = args.delete(:signatures)
+
     contract = Paperlex::Contract.create({"body" => @body,"subject" => @subject,"number_of_signers" => 2}.merge(args))
+
+    if signature_count
+      signature_count = Integer(signature_count)
+      signatures = signers.sample(signature_count)
+
+      unless Paperlex.token
+        FakeWeb.register_uri :post, "#{Paperlex.base_url}/contracts/#{@contract_uuid}/signatures.json", signatures.map {|signature_email| {:body => "{\"uuid\":\"#{SecureRandom.hex(16)}\",\"identity_verification_value\":\"#{signature_email}\",\"identity_verification_method\":\"e-mail\",\"signer_uuid\":\"#{SecureRandom.hex(16)}\",\"created_at\":\"2011-10-27T23:28:31Z\"}"} }
+      end
+
+      signatures.each do |signature_email|
+        contract.create_signature(:signer => signature_email, :identity => {:value => signature_email})
+      end
+    end
+    contract
   end
 
   describe ".all" do
@@ -170,6 +186,84 @@ describe Paperlex::Contract do
       @contract.body.should == 'Foo'
       @contract.subject.should == 'Bar'
       @contract.number_of_signers.should == 3
+    end
+  end
+
+  describe "#create_signature" do
+    before do
+      @contract = create_contract(:signers => 1)
+      @signer = @contract.signers.first
+      unless Paperlex.token
+        FakeWeb.register_uri :post, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/signatures.json", :body => "{\"uuid\":\"#{SecureRandom.hex(16)}\",\"created_at\":\"2011-12-09T02:09:23Z\",\"identity_verification_method\":\"e-mail\",\"identity_verification_value\":\"#{@signer.email}\",\"signer_uuid\":\"#{@signer.uuid}\"}"
+      end
+    end
+
+    it "should create a signature" do
+      signature = @contract.create_signature(:signer => @signer.uuid, :identity => {:value => @signer.email})
+      signature.identity_verification_value.should == @signer.email
+      @contract.signatures.should include(signature)
+    end
+  end
+
+  describe "#fetch_signatures" do
+    before do
+      @contract = create_contract
+      @signer_emails = [Faker::Internet.email, Faker::Internet.email]
+
+      if Paperlex.token
+        @signer_emails.each do |email|
+          @contract.create_signature(:signer => email, :identity => {:value => email})
+        end
+      else
+        FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/signatures.json", {:body => "[#{@signer_emails.map {|signer_email|  "{\"uuid\":\"#{SecureRandom.hex(16)}\",\"identity_verification_value\":\"#{signer_email}\",\"identity_verification_method\":\"\",\"signer_uuid\":\"#{SecureRandom.hex(16)}\",\"created_at\":\"2011-12-09T02:10:26Z\"}"}.join(", ")}]" }
+      end
+    end
+
+    it "should update the signers" do
+      @contract.signatures.should be_empty
+      @signatures = @contract.fetch_signatures
+      @contract.signatures.should == @signatures
+      @signatures.should be_present
+      @signatures.length.should == 2
+      @signatures.map {|signature| signature.identity_verification_value }.should =~ @signer_emails
+    end
+  end
+
+  describe "#fetch_signature" do
+    before do
+      @contract = create_contract(:signatures => 2)
+    end
+
+    shared_examples_for "successful signature fetch" do
+      it "should fetch the new signer data" do
+        @new_email = Faker::Internet.email
+        @signature.identity_verification_value.should_not == @new_email
+        if Paperlex.token
+          Paperlex::Contract::Signers[@contract.uuid].update(@signature.uuid, :email => @new_email)
+        else
+          FakeWeb.register_uri :get, "#{Paperlex.base_url}/contracts/#{@contract.uuid}/signatures/#{@signature.uuid}.json", {:body => "{\"uuid\":\"#{@signature.uuid}\",\"created_at\":\"2011-12-09T02:09:23Z\",\"identity_verification_method\":\"e-mail\",\"identity_verification_value\":\"#{@new_email}\",\"signer_uuid\":\"#{@signature.signer_uuid}\"}" }
+        end
+        @new_signature = @contract.fetch_signature(@identifier)
+        @new_signature.identity_verification_value.should == @new_email
+        @contract.signatures.should include(@new_signature)
+        @contract.signatures.should_not include(@signature)
+      end
+    end
+
+    context "when provided a uuid" do
+      before do
+        @signature = @contract.signatures.first
+        @identifier = @signature.uuid
+      end
+      it_should_behave_like "successful signature fetch"
+    end
+
+    context "when provided a signer" do
+      before do
+        @signature = @contract.signatures.first
+        @identifier = @signature
+      end
+      it_should_behave_like "successful signature fetch"
     end
   end
 

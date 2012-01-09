@@ -4,6 +4,7 @@ module Paperlex
 
     extend ActiveSupport::Autoload
     autoload :Signers
+    autoload :Signatures
     autoload :Responses
     autoload :ReviewSessions
     autoload :Versions
@@ -134,6 +135,31 @@ module Paperlex
       ReviewSessions[uuid].destroy(review_session_uuid)
     end
 
+    # Signatures
+    # Requires access to the remote signature program:
+    # https://api.paperlex.com/remote_signature.html
+    def signatures=(signatures)
+      self[:signatures] = signatures.map {|signature| signature.is_a?(Paperlex::Signature) ? signature : Paperlex::Signature.new(signature.merge(:contract_uuid => uuid)) }
+    end
+
+    def fetch_signatures
+      self.signatures = Signatures[uuid].all
+      signatures
+    end
+
+    def fetch_signature(signature_uuid)
+      remove_signature!(signature_uuid)
+      new_signature = Signatures[uuid].find(signature_uuid)
+      self.signatures << new_signature
+      new_signature
+    end
+
+    def create_signature(attrs)
+      signature = Signatures[uuid].create(attrs)
+      self.signatures << signature
+      signature
+    end
+
     # Versions
     def versions
       Versions[uuid].all.map {|version| Version.new(version) }
@@ -184,6 +210,11 @@ module Paperlex
     def remove_signer!(signer_to_remove)
       signer_uuid = to_uuid(signer_to_remove)
       signers.delete_if {|signer| signer['uuid'] == signer_uuid }
+    end
+
+    def remove_signature!(signature_to_remove)
+      signature_uuid = to_uuid(signature_to_remove)
+      signatures.delete_if {|signature| signature['uuid'] == signature_uuid }
     end
 
     def remove_review_session!(review_session_to_remove)
