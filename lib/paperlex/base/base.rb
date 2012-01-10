@@ -16,7 +16,7 @@ module Paperlex
       end
 
       def get(url, attrs = {})
-        parse(RestClient::Request.execute(:method => :get, :url => "#{Paperlex.base_url}/#{url}", :payload => attrs.merge(:token => Paperlex.token)))
+        parse(RestClient.get("#{Paperlex.base_url}/#{url}?#{attrs.merge(:token => Paperlex.token).to_query}"))
       end
 
       def post(url, attrs = {})
@@ -28,7 +28,7 @@ module Paperlex
       end
 
       def delete(url, attrs = {})
-        parse(RestClient::Request.execute(:method => :delete, :url => "#{Paperlex.base_url}/#{url}", :payload => attrs.merge(:token => Paperlex.token)))
+        parse(RestClient.delete("#{Paperlex.base_url}/#{url}?#{attrs.merge(:token => Paperlex.token).to_query}"))
       end
     end
 
