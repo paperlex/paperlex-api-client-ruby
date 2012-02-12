@@ -8,19 +8,21 @@ Bundler.require(:default, :development)
 # in spec/support/ and its subdirectories.
 Dir[File.expand_path("../support/**/*.rb", __FILE__)].each {|f| require f }
 
-if ENV['TOKEN']
-  Paperlex.token = ENV['TOKEN']
-elsif ENV['REMOTE_SIGNATURE_TOKEN']
-  # we'll set Paperlex.token where needed in the specs
-else
-  FakeWeb.allow_net_connect = false
-end
-
 if ENV['PAPERLEX_URL']
   Paperlex.base_url = ENV['PAPERLEX_URL']
 end
 
 RSpec.configure do |config|
+  config.before do
+    if ENV['TOKEN']
+      Paperlex.token = ENV['TOKEN']
+    elsif ENV['REMOTE_SIGNATURE_TOKEN']
+      # we'll set Paperlex.token where needed in the specs
+    else
+      FakeWeb.allow_net_connect = false
+    end
+  end
+
   # == Mock Framework
   #
   # If you prefer to use mocha, flexmock or RR, uncomment the appropriate line:
